@@ -1,0 +1,56 @@
+<h1 class="mt-4">Editar Empleado</h1>
+<p class="lead mb-4">Actualizar información del empleado</p>
+
+<div class="card mb-4">
+  <div class="card-header bg-warning text-dark">
+    <h5 class="mb-0">Datos del Empleado</h5>
+  </div>
+  <div class="card-body">
+    <form action="/recursos-humanos/empleados/edit/<%= employee._id %>" method="POST" novalidate>
+      <!-- Datos básicos -->
+      <div class="form-group row">
+        <label for="cedula" class="col-sm-3 col-form-label">Cédula <span class="text-danger">*</span></label>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" id="cedula" name="cedula" value="<%= employee.cedula %>" required>
+          <small class="form-text text-muted">Formato: V-12345678 o E-12345678</small>
+        </div>
+      </div>
+      
+      <div class="form-group row">
+        <label for="nombres" class="col-sm-3 col-form-label">Nombres <span class="text-danger">*</span></label>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" id="nombres" name="nombres" value="<%= employee.nombres %>" required>
+        </div>
+      </div>
+      
+      <div class="form-group row">
+        <label for="apellidos" class="col-sm-3 col-form-label">Apellidos <span class="text-danger">*</span></label>
+        <div class="col-sm-9">
+          <input type="text" class="form-control" id="apellidos" name="apellidos" value="<%= employee.apellidos %>" required>
+        </div>
+      </div>
+      
+      <div class="form-group row">
+        <label for="email" class="col-sm-3 col-form-label">Email <span class="text-danger">*</span></label>
+        <div class="col-sm-9">
+          <input type="email" class="form-control" id="email" name="email" value="<%= employee.email %>" required>
+        </div>
+      </div>
+      
+      <div class="form-group row">
+        <div class="col-sm-9 offset-sm-3">
+          <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i> Todos los campos son obligatorios.
+          </div>
+        </div>
+      </div>
+      
+      <div class="form-group row">
+        <div class="col-sm-9 offset-sm-3">
+          <button type="submit" class="btn btn-warning"><i class="fas fa-save"></i> Actualizar</button>
+          <a href="/recursos-humanos/empleados" class="btn btn-secondary"><i class="fas fa-times"></i> Cancelar</a>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>

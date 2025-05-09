@@ -1,0 +1,134 @@
+<h1 class="mt-4">Configuración de Validaciones QR</h1>
+<p class="lead mb-4">Bienvenido, <%= user.name %> | <span class="badge badge-info">Caja</span></p>
+
+<div class="row">
+  <div class="col-md-12 mb-4">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Activar/Desactivar Validaciones QR</h5>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle"></i> Configure qué elementos se validarán al escanear un código QR. Active o desactive cada opción según sea necesario.
+        </div>
+        
+        <form id="formValidacionesQR" action="/caja/actualizar-validaciones-qr" method="POST">
+          <div class="row">
+            <div class="col-md-6 mb-4">
+              <div class="card">
+                <div class="card-body text-center">
+                  <h4><i class="fas fa-user-plus"></i> Inscripción</h4>
+                  <p>Validar estado de inscripción al escanear QR</p>
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="validarInscripcion" name="validarInscripcion" <%= validaciones.inscripcion ? 'checked' : '' %>>
+                    <label class="custom-control-label" for="validarInscripcion">
+                      <span class="text-success">Activado</span> / <span class="text-danger">Desactivado</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-6 mb-4">
+              <div class="card">
+                <div class="card-body text-center">
+                  <h4><i class="fas fa-money-bill-wave"></i> Primera Cuota</h4>
+                  <p>Validar pago de primera cuota al escanear QR</p>
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="validarPrimeraCuota" name="validarPrimeraCuota" <%= validaciones.primeraCuota ? 'checked' : '' %>>
+                    <label class="custom-control-label" for="validarPrimeraCuota">
+                      <span class="text-success">Activado</span> / <span class="text-danger">Desactivado</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-6 mb-4">
+              <div class="card">
+                <div class="card-body text-center">
+                  <h4><i class="fas fa-money-bill-wave"></i> Segunda Cuota</h4>
+                  <p>Validar pago de segunda cuota al escanear QR</p>
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="validarSegundaCuota" name="validarSegundaCuota" <%= validaciones.segundaCuota ? 'checked' : '' %>>
+                    <label class="custom-control-label" for="validarSegundaCuota">
+                      <span class="text-success">Activado</span> / <span class="text-danger">Desactivado</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="col-md-6 mb-4">
+              <div class="card">
+                <div class="card-body text-center">
+                  <h4><i class="fas fa-money-bill-wave"></i> Tercera Cuota</h4>
+                  <p>Validar pago de tercera cuota al escanear QR</p>
+                  <div class="custom-control custom-switch">
+                    <input type="checkbox" class="custom-control-input" id="validarTerceraCuota" name="validarTerceraCuota" <%= validaciones.terceraCuota ? 'checked' : '' %>>
+                    <label class="custom-control-label" for="validarTerceraCuota">
+                      <span class="text-success">Activado</span> / <span class="text-danger">Desactivado</span>
+                    </label>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="text-center mt-4">
+            <button type="submit" class="btn btn-primary btn-lg">
+              <i class="fas fa-save"></i> Guardar Configuración
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row mt-4">
+  <div class="col-md-12">
+    <div class="card bg-light">
+      <div class="card-body">
+        <h5><i class="fas fa-info-circle"></i> Información</h5>
+        <p>Esta configuración determina qué pagos serán validados cuando un estudiante presenta su código QR. Si una opción está desactivada, no se verificará ese requisito.</p>
+        <p>Por ejemplo, si solo la "Inscripción" está activada, únicamente se verificará si el estudiante ha pagado la inscripción al escanear el QR.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mt-3">
+  <a href="/dashboard" class="btn btn-secondary mr-2"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+  <a href="/caja" class="btn btn-info mr-2"><i class="fas fa-list"></i> Ver Pagos</a>
+  <a href="/users/logout" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Actualizar visualmente el estado del switch cuando cambia
+    const switches = document.querySelectorAll('.custom-control-input');
+    switches.forEach(switchEl => {
+      switchEl.addEventListener('change', function() {
+        const label = this.nextElementSibling;
+        if (this.checked) {
+          label.querySelector('.text-success').style.fontWeight = 'bold';
+          label.querySelector('.text-danger').style.fontWeight = 'normal';
+        } else {
+          label.querySelector('.text-success').style.fontWeight = 'normal';
+          label.querySelector('.text-danger').style.fontWeight = 'bold';
+        }
+      });
+      
+      // Inicializar el estilo según el estado inicial
+      const label = switchEl.nextElementSibling;
+      if (switchEl.checked) {
+        label.querySelector('.text-success').style.fontWeight = 'bold';
+        label.querySelector('.text-danger').style.fontWeight = 'normal';
+      } else {
+        label.querySelector('.text-success').style.fontWeight = 'normal';
+        label.querySelector('.text-danger').style.fontWeight = 'bold';
+      }
+    });
+  });
+</script> 

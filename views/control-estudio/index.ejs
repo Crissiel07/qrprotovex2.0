@@ -1,0 +1,195 @@
+<h1 class="mt-4">Panel de Control de Estudio</h1>
+<p class="lead mb-4">Bienvenido, <%= user.name %> | <span class="badge badge-info">Control de Estudio</span></p>
+
+<div class="row">
+  <div class="col-md-12 mb-4">
+    <div class="card">
+      <div class="card-header bg-info text-white">
+        <h5 class="mb-0">Gestión Académica</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-4 mb-3">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-user-graduate fa-3x mb-3 text-primary"></i>
+                <h5>Estudiantes</h5>
+                <p>Administra los registros de estudiantes</p>
+                <a href="/control-estudio/estudiantes" class="btn btn-primary">Gestionar Estudiantes</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-book fa-3x mb-3 text-success"></i>
+                <h5>Materias</h5>
+                <p>Gestiona las materias y cursos</p>
+                <a href="#" class="btn btn-success">Gestionar Materias</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-clipboard-list fa-3x mb-3 text-warning"></i>
+                <h5>Calificaciones</h5>
+                <p>Registra y consulta calificaciones</p>
+                <a href="#" class="btn btn-warning text-white">Gestionar Calificaciones</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6 mb-4">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">Estadísticas Académicas</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <div class="card bg-info text-white">
+              <div class="card-body text-center">
+                <h3><i class="fas fa-user-graduate"></i> 245</h3>
+                <p>Estudiantes Activos</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <div class="card bg-success text-white">
+              <div class="card-body text-center">
+                <h3><i class="fas fa-book"></i> 32</h3>
+                <p>Materias Registradas</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <div class="card bg-warning text-white">
+              <div class="card-body text-center">
+                <h3><i class="fas fa-chalkboard-teacher"></i> 18</h3>
+                <p>Profesores</p>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 mb-3">
+            <div class="card bg-danger text-white">
+              <div class="card-body text-center">
+                <h3><i class="fas fa-calendar-alt"></i> 4</h3>
+                <p>Períodos Activos</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-6 mb-4">
+    <div class="card">
+      <div class="card-header bg-success text-white">
+        <h5 class="mb-0">Actividad Reciente</h5>
+      </div>
+      <div class="card-body">
+        <ul class="list-group">
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <i class="fas fa-user-plus text-success"></i>
+              <span class="ml-2">Nuevo estudiante registrado</span>
+              <small class="text-muted d-block">Carlos Mendoza</small>
+            </div>
+            <span class="badge badge-primary badge-pill">Hace 5 min</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <i class="fas fa-book text-info"></i>
+              <span class="ml-2">Nueva materia creada</span>
+              <small class="text-muted d-block">Matemáticas Avanzadas</small>
+            </div>
+            <span class="badge badge-primary badge-pill">Hace 15 min</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <i class="fas fa-clipboard-check text-warning"></i>
+              <span class="ml-2">Calificaciones actualizadas</span>
+              <small class="text-muted d-block">Grupo 3A - Física</small>
+            </div>
+            <span class="badge badge-primary badge-pill">Hace 30 min</span>
+          </li>
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              <i class="fas fa-calendar-plus text-danger"></i>
+              <span class="ml-2">Nuevo período académico</span>
+              <small class="text-muted d-block">2025-B</small>
+            </div>
+            <span class="badge badge-primary badge-pill">Hace 45 min</span>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-12 mb-4">
+    <div class="card">
+      <div class="card-header bg-secondary text-white">
+        <h5 class="mb-0">Herramientas Adicionales</h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-file-pdf fa-3x mb-3 text-danger"></i>
+                <h5>Reportes</h5>
+                <p>Genera reportes académicos</p>
+                <a href="#" class="btn btn-danger">Generar Reportes</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-calendar-alt fa-3x mb-3 text-primary"></i>
+                <h5>Horarios</h5>
+                <p>Gestiona horarios de clases</p>
+                <a href="#" class="btn btn-primary">Gestionar Horarios</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-chalkboard-teacher fa-3x mb-3 text-success"></i>
+                <h5>Profesores</h5>
+                <p>Administra el personal docente</p>
+                <a href="#" class="btn btn-success">Gestionar Profesores</a>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-3 mb-3">
+            <div class="card">
+              <div class="card-body text-center">
+                <i class="fas fa-cogs fa-3x mb-3 text-info"></i>
+                <h5>Configuración</h5>
+                <p>Configura parámetros académicos</p>
+                <a href="#" class="btn btn-info">Configuración</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mt-3">
+  <a href="/dashboard" class="btn btn-secondary mr-2"><i class="fas fa-arrow-left"></i> Volver al Dashboard</a>
+  <a href="/users/logout" class="btn btn-danger"><i class="fas fa-sign-out-alt"></i> Cerrar Sesión</a>
+</div>

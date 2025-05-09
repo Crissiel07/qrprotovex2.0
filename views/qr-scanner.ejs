@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Escáner de QR - ProtoVex</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
+  <style>
+    body {
+      padding-top: 20px;
+      background-color: #f8f9fa;
+    }
+    .card {
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    #reader {
+      width: 100%;
+      max-width: 500px;
+      min-height: 300px;
+      margin: 0 auto;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      overflow: hidden;
+    }
+    #result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 5px;
+      display: none;
+    }
+    #manual-entry {
+      display: none;
+      margin-top: 20px;
+      padding: 15px;
+      border: 1px solid #ddd;
+      border-radius: 10px;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row mb-4">
+      <div class="col-md-12 text-center">
+        <h1>Escáner de Códigos QR</h1>
+        <p class="lead">Escanea el código QR de un estudiante para verificar su información</p>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-8 offset-md-2">
+        <div class="card">
+          <div class="card-header bg-primary text-white">
+            <h5 class="mb-0"><i class="fas fa-qrcode"></i> Escanear QR</h5>
+          </div>
+          <div class="card-body">
+            <!-- Contenedor del lector QR -->
+            <div id="reader-container">
+              <div id="reader"></div>
+              
+              <div class="d-flex justify-content-center mt-3">
+                <button id="start-button" class="btn btn-primary mr-2">
+                  <i class="fas fa-play"></i> Iniciar Cámara
+                </button>
+                <button id="stop-button" class="btn btn-secondary mr-2" disabled>
+                  <i class="fas fa-stop"></i> Detener
+                </button>
+                <button id="manual-button" class="btn btn-info">
+                  <i class="fas fa-keyboard"></i> Entrada Manual
+                </button>
+              </div>
+            </div>
+
+            <!-- Formulario de entrada manual -->
+            <div id="manual-entry">
+              <h5 class="mb-3">Introducir Código Manualmente</h5>
+              <div class="form-group">
+                <label for="manual-code">Código QR o ID de Estudiante:</label>
+                <input type="text" class="form-control" id="manual-code" placeholder="Ingrese el código o ID del estudiante">
+              </div>
+              <div class="d-flex">
+                <button id="submit-manual" class="btn btn-primary mr-2">Verificar</button>
+                <button id="cancel-manual" class="btn btn-secondary">Cancelar</button>
+              </div>
+            </div>
+
+            <div id="result" class="mt-4 alert">
+              <h5 id="result-title"></h5>
+              <div id="result-content"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      const startButton = document.getElementById('start-button');
+      const stopButton = document.getElementById('stop-button');
+      const manualButton = document.getElementById('manual-button');
+      const submitManualButton = document.getElementById('submit-manual');
+      const cancelManualButton = document.getElementById('cancel-manual');
+      const manualEntry = document.getElementById('manual-entry');
+      const readerContainer = document.getElementById('reader-container');
+      const manualCodeInput = document.getElementById('manual-code');
+      const resultDiv = document.getElementById('result');
+      const resultTitle = document.getElementById('result-title');
+      const resultContent = document.getElementById('result-content');
+      
+      let html5QrCode;
+      let cameraError = false;
+      
+      // Botón para mostrar entrada manual
+      manualButton.addEventListener('click', function() {
+        readerContainer.style.display = 'none';
+        manualEntry.style.display = 'block';
+        resultDiv.style.display = 'none';
+      });
+      
+      // Botón para cancelar entrada manual
+      cancelManualButton.addEventListener('click', function() {
+        manualEntry.style.display = 'none';
+        readerContainer.style.display = 'block';
+        manualCodeInput.value = '';
+      });
+      
+      // Botón para enviar código manual
+      submitManualButton.addEventListener('click', function() {
+        const code = manualCodeInput.value.trim();
+        if (!code) {
+          alert('Por favor, ingrese un código válido');
+          return;
+        }
+        
+        verifyCode(code);
+      });
+      
+      // Iniciar el escáner
+      startButton.addEventListener('click', function() {
+        // Ocultar cualquier resultado anterior
+        resultDiv.style.display = 'none';
+        
+        // Crear nueva instancia del escáner
+        html5QrCode = new Html5Qrcode("reader");
+        
+        const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+          // Manejar el código QR escaneado
+          onScanSuccess(decodedText, decodedResult);
+        };
+        
+        // Mejorar la configuración para que sea más rápido
+        const config = {
+          fps: 30,                // Mayor velocidad de frames
+          qrbox: { width: 250, height: 250 },
+          formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE], // Solo buscar códigos QR
+          experimentalFeatures: {
+            useBarCodeDetectorIfSupported: true // Usar la API nativa de detección si está disponible
+          },
+          aspectRatio: 1.0,       // Mejor ratio para QR
+          disableFlip: false      // Permitir escaneo espejado
+        };
+        
+        // Mostrar mensaje de inicialización
+        showMessage('Iniciando cámara, por favor espere...');
+        
+        // Obtener la lista de cámaras disponibles
+        Html5Qrcode.getCameras()
+          .then(cameras => {
+            if (cameras && cameras.length > 0) {
+              // Usar preferentemente la cámara trasera en dispositivos móviles
+              let selectedCamera = cameras[0].id;
+              
+              // Buscar una cámara trasera
+              for (const camera of cameras) {
+                if (camera.label.toLowerCase().includes('back') || 
+                    camera.label.toLowerCase().includes('trasera') || 
+                    camera.label.toLowerCase().includes('rear')) {
+                  selectedCamera = camera.id;
+                  break;
+                }
+              }
+              
+              // Iniciar con la cámara seleccionada
+              startCameraById(selectedCamera);
+            } else {
+              // Falló la detección de cámaras, usar configuración por defecto
+              startWithDefaultCamera();
+            }
+          })
+          .catch(err => {
+            console.error("Error al enumerar cámaras:", err);
+            startWithDefaultCamera();
+          });
+        
+        // Función para iniciar con una cámara específica
+        function startCameraById(cameraId) {
+          html5QrCode.start(
+            { deviceId: { exact: cameraId } }, 
+            config,
+            qrCodeSuccessCallback,
+            onScanFailure
+          ).then(() => {
+            console.log("Escáner QR iniciado correctamente con cámara ID:", cameraId);
+            cameraError = false;
+            startButton.disabled = true;
+            stopButton.disabled = false;
+          }).catch(err => {
+            console.error("Error al iniciar con cámara específica:", err);
+            startWithDefaultCamera();
+          });
+        }
+        
+        // Función para iniciar con configuración por defecto
+        function startWithDefaultCamera() {
+          // Intentar con la cámara trasera primero (móviles)
+          html5QrCode.start({ facingMode: "environment" }, config, qrCodeSuccessCallback, onScanFailure)
+            .then(() => {
+              console.log("Escáner QR iniciado correctamente");
+              cameraError = false;
+              startButton.disabled = true;
+              stopButton.disabled = false;
+            })
+            .catch((err) => {
+              // Si no funcionó con la cámara trasera, intentar con la frontal
+              console.error("Error al iniciar con cámara trasera:", err);
+              
+              html5QrCode.start({ facingMode: "user" }, config, qrCodeSuccessCallback, onScanFailure)
+                .then(() => {
+                  console.log("Escáner QR iniciado con cámara frontal");
+                  cameraError = false;
+                  startButton.disabled = true;
+                  stopButton.disabled = false;
+                })
+                .catch((frontErr) => {
+                  console.error("Error al iniciar con cualquier cámara:", frontErr);
+                  cameraError = true;
+                  
+                  // Mostrar mensaje de error
+                  let errorMsg = "No se pudo acceder a la cámara. ";
+                  
+                  if (frontErr.toString().includes("NotReadableError")) {
+                    errorMsg += "La cámara puede estar siendo usada por otra aplicación o tener un problema. ";
+                  } else if (frontErr.toString().includes("NotAllowedError")) {
+                    errorMsg += "No se dieron permisos para usar la cámara. ";
+                  } else if (frontErr.toString().includes("NotFoundError")) {
+                    errorMsg += "No se encontró ninguna cámara en este dispositivo. ";
+                  }
+                  
+                  errorMsg += "Intente con la opción de entrada manual.";
+                  showError(errorMsg);
+                  
+                  // Mostrar opción manual automáticamente si hay error de cámara
+                  manualButton.click();
+                });
+            });
+        }
+      });
+      
+      // Detener el escáner
+      stopButton.addEventListener('click', function() {
+        if (html5QrCode && html5QrCode.isScanning) {
+          html5QrCode.stop()
+            .then(() => {
+              console.log('Escáner QR detenido');
+              startButton.disabled = false;
+              stopButton.disabled = true;
+            })
+            .catch((err) => {
+              console.error('Error al detener el escáner QR:', err);
+            });
+        }
+      });
+      
+      // Función cuando se detecta un código QR
+      function onScanSuccess(decodedText, decodedResult) {
+        console.log(`Código escaneado: ${decodedText}`, decodedResult);
+        
+        // Detener el escáner después de un escaneo exitoso
+        if (html5QrCode && html5QrCode.isScanning) {
+          html5QrCode.stop()
+            .then(() => {
+              console.log('Escáner QR detenido después de escaneo exitoso');
+              startButton.disabled = false;
+              stopButton.disabled = true;
+            })
+            .catch((err) => {
+              console.error('Error al detener el escáner QR:', err);
+            });
+        }
+        
+        // Mostrar información temporal
+        showMessage('Verificando código...', 'info');
+        
+        verifyCode(decodedText);
+      }
+      
+      // Función para mostrar un mensaje temporal
+      function showMessage(message, type = 'info') {
+        resultDiv.className = `alert alert-${type}`;
+        resultTitle.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Procesando';
+        resultContent.innerHTML = `<p>${message}</p>`;
+        resultDiv.style.display = 'block';
+      }
+      
+      // Verificar el código (usado tanto por escáner como entrada manual)
+      function verifyCode(code) {
+        showMessage(`Verificando código: ${code}`, 'info');
+        
+        fetch(`/verificar-qr?code=${encodeURIComponent(code)}`)
+          .then(response => {
+            if (!response.ok) {
+              if (response.status === 404) {
+                throw new Error('Estudiante no encontrado. Verifique que el código QR es correcto.');
+              } else {
+                throw new Error('Error en la respuesta del servidor. Código: ' + response.status);
+              }
+            }
+            return response.json();
+          })
+          .then(data => {
+            if (data.error) {
+              showError(data.error);
+            } else {
+              showSuccess(data);
+            }
+          })
+          .catch(error => {
+            showError('Error al verificar el código: ' + error.message);
+          });
+      }
+      
+      // Función cuando hay un error en el escaneo
+      function onScanFailure(error) {
+        // No mostramos errores de escaneo continuos
+      }
+      
+      // Mostrar error
+      function showError(message) {
+        resultDiv.className = 'alert alert-danger';
+        resultTitle.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Error';
+        resultContent.innerHTML = `
+          <p>${message}</p>
+          <div class="mt-3">
+            <button class="btn btn-primary btn-sm" onclick="window.location.reload()">
+              <i class="fas fa-redo"></i> Intentar de nuevo
+            </button>
+          </div>
+        `;
+        resultDiv.style.display = 'block';
+      }
+      
+      // Mostrar éxito
+      function showSuccess(data) {
+        // Ocultar entrada manual si está visible
+        if (manualEntry.style.display === 'block') {
+          manualEntry.style.display = 'none';
+          readerContainer.style.display = 'block';
+          manualCodeInput.value = '';
+        }
+        
+        // Determinar el estilo según el resultado de la validación
+        if (data.validacionAprobada) {
+          resultDiv.className = 'alert alert-success';
+          resultTitle.innerHTML = '<i class="fas fa-check-circle"></i> Validación Exitosa';
+        } else {
+          resultDiv.className = 'alert alert-warning';
+          resultTitle.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Validación Pendiente';
+        }
+        
+        // Construir el contenido del resultado
+        let content = `
+          <p><strong>Nombre:</strong> ${data.nombres} ${data.apellidos}</p>
+          <p><strong>Cédula:</strong> ${data.cedula}</p>
+          <p><strong>Carrera:</strong> ${data.carrera || 'No especificada'}</p>
+          
+          <div class="mt-3 ${data.validacionAprobada ? 'bg-success' : 'bg-warning'} text-white p-2 rounded">
+            <h5>Estado de Validación: <span class="badge badge-${data.validacionAprobada ? 'light' : 'danger'}">${data.validacionAprobada ? 'APROBADO' : 'PENDIENTE'}</span></h5>
+            <p>${data.mensajeValidacion}</p>
+          </div>
+          
+         
+          
+          <div class="mt-3 mb-2">
+            <button class="btn btn-primary btn-sm" onclick="window.location.reload()">
+              <i class="fas fa-redo"></i> Escanear Otro QR
+            </button>
+          </div>
+        `;
+        
+        resultContent.innerHTML = content;
+        resultDiv.style.display = 'block';
+      }
+    });
+  </script>
+</body>
+</html> 

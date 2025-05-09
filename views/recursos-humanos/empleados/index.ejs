@@ -1,0 +1,102 @@
+<div class="container-fluid px-0">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="h3 mb-2 text-gray-800">Gestión de Empleados</h1>
+          <p class="mb-0 text-muted">Listado de empleados registrados en el sistema</p>
+        </div>
+        <a href="/recursos-humanos/empleados/create" class="btn btn-primary">
+          <i class="fas fa-user-plus mr-1"></i> Nuevo Empleado
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow mb-4 border-left-primary">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+      <h6 class="m-0 font-weight-bold text-primary">
+        <i class="fas fa-users mr-1"></i> Empleados Registrados
+      </h6>
+      <div class="dropdown no-arrow">
+        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+          <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+        </a>
+        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+          <div class="dropdown-header">Opciones:</div>
+          <a class="dropdown-item" href="/recursos-humanos/empleados/create">
+            <i class="fas fa-user-plus fa-sm fa-fw mr-2 text-gray-400"></i>
+            Nuevo Empleado
+          </a>
+          <a class="dropdown-item" href="/recursos-humanos">
+            <i class="fas fa-arrow-left fa-sm fa-fw mr-2 text-gray-400"></i>
+            Volver al Panel
+          </a>
+        </div>
+      </div>
+    </div>
+    <div class="card-body">
+      <% if(typeof employees !== 'undefined' && employees.length > 0) { %>
+        <div class="table-responsive">
+          <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+            <thead class="bg-light">
+              <tr>
+                <th>Cédula</th>
+                <th>Nombres</th>
+                <th>Apellidos</th>
+                <th>Email</th>
+                <th class="text-center">Acciones</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% employees.forEach(employee => { %>
+                <tr>
+                  <td><span class="font-weight-bold"><%= employee.cedula %></span></td>
+                  <td><%= employee.nombres %></td>
+                  <td><%= employee.apellidos %></td>
+                  <td><a href="mailto:<%= employee.email %>"><%= employee.email %></a></td>
+                  <td class="text-center">
+                    <div class="btn-group">
+                      <a href="/recursos-humanos/empleados/view/<%= employee._id %>" class="btn btn-sm btn-info" title="Ver detalles">
+                        <i class="fas fa-eye"></i>
+                      </a>
+                      <a href="/recursos-humanos/empleados/edit/<%= employee._id %>" class="btn btn-sm btn-warning" title="Editar">
+                        <i class="fas fa-edit"></i>
+                      </a>
+                      <a href="/recursos-humanos/empleados/delete/<%= employee._id %>" class="btn btn-sm btn-danger" title="Eliminar" onclick="return confirm('¿Está seguro de eliminar este empleado?')">
+                        <i class="fas fa-trash"></i>
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+              <% }); %>
+            </tbody>
+          </table>
+        </div>
+      <% } else { %>
+        <div class="alert alert-info bg-light-info border-0">
+          <div class="d-flex">
+            <div class="mr-3">
+              <i class="fas fa-info-circle fa-2x text-info"></i>
+            </div>
+            <div>
+              <h5 class="alert-heading text-info">No hay empleados registrados</h5>
+              <p class="mb-0">No se encontraron empleados en el sistema. Puedes registrar un nuevo empleado haciendo clic en el botón a continuación.</p>
+              <a href="/recursos-humanos/empleados/create" class="btn btn-info mt-3">
+                <i class="fas fa-user-plus mr-1"></i> Registrar Nuevo Empleado
+              </a>
+            </div>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="col-12">
+      <a href="/recursos-humanos" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left mr-1"></i> Volver al Panel de Recursos Humanos
+      </a>
+    </div>
+  </div>
+</div>

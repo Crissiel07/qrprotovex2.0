@@ -1,0 +1,278 @@
+<%- include('../partials/header') %>
+<%- include('../partials/navbar') %>
+<%- include('../partials/sidebar') %>
+
+<div class="content-wrapper">
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0">Gestión de Datos de Formularios</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="/">Inicio</a></li>
+            <li class="breadcrumb-item active">Datos de Formularios</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="content">
+    <div class="container-fluid">
+      <!-- Filtros -->
+      <div class="card card-primary card-outline">
+        <div class="card-header">
+          <h3 class="card-title">Filtros</h3>
+          <div class="card-tools">
+            <button type="button" class="btn btn-tool" data-card-widget="collapse">
+              <i class="fas fa-minus"></i>
+            </button>
+          </div>
+        </div>
+        <div class="card-body">
+          <form action="/form-data" method="GET" class="row">
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="formType">Tipo de Formulario</label>
+                <select class="form-control" id="formType" name="formType">
+                  <option value="">Todos</option>
+                  <option value="estudiante" <%= filters && filters.formType === 'estudiante' ? 'selected' : '' %>>Estudiante</option>
+                  <option value="pago" <%= filters && filters.formType === 'pago' ? 'selected' : '' %>>Pago</option>
+                  <option value="inscripcion" <%= filters && filters.formType === 'inscripcion' ? 'selected' : '' %>>Inscripción</option>
+                  <option value="otro" <%= filters && filters.formType === 'otro' ? 'selected' : '' %>>Otro</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3">
+              <div class="form-group">
+                <label for="status">Estado</label>
+                <select class="form-control" id="status" name="status">
+                  <option value="">Todos</option>
+                  <option value="pendiente" <%= filters && filters.status === 'pendiente' ? 'selected' : '' %>>Pendiente</option>
+                  <option value="procesado" <%= filters && filters.status === 'procesado' ? 'selected' : '' %>>Procesado</option>
+                  <option value="rechazado" <%= filters && filters.status === 'rechazado' ? 'selected' : '' %>>Rechazado</option>
+                  <option value="completado" <%= filters && filters.status === 'completado' ? 'selected' : '' %>>Completado</option>
+                </select>
+              </div>
+            </div>
+            <div class="col-md-3 d-flex align-items-end">
+              <div class="form-group">
+                <button type="submit" class="btn btn-primary">
+                  <i class="fas fa-search mr-1"></i> Filtrar
+                </button>
+                <a href="/form-data" class="btn btn-secondary ml-2">
+                  <i class="fas fa-sync-alt mr-1"></i> Limpiar
+                </a>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <!-- Estadísticas -->
+      <div class="row">
+        <div class="col-lg-3 col-6">
+          <div class="small-box bg-info">
+            <div class="inner">
+              <h3 id="totalForms">0</h3>
+              <p>Total Formularios</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-file-alt"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-6">
+          <div class="small-box bg-warning">
+            <div class="inner">
+              <h3 id="pendingForms">0</h3>
+              <p>Pendientes</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-clock"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-6">
+          <div class="small-box bg-success">
+            <div class="inner">
+              <h3 id="completedForms">0</h3>
+              <p>Completados</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-check-circle"></i>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-3 col-6">
+          <div class="small-box bg-danger">
+            <div class="inner">
+              <h3 id="rejectedForms">0</h3>
+              <p>Rechazados</p>
+            </div>
+            <div class="icon">
+              <i class="fas fa-times-circle"></i>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Listado de Formularios -->
+      <div class="card">
+        <div class="card-header">
+          <h3 class="card-title">Listado de Formularios</h3>
+        </div>
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped" id="formsTable">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Tipo</th>
+                  <th>Estudiante</th>
+                  <th>Creado por</th>
+                  <th>Fecha</th>
+                  <th>Estado</th>
+                  <th>Acciones</th>
+                </tr>
+              </thead>
+              <tbody>
+                <% if(typeof formData != 'undefined' && formData.length > 0) { %>
+                  <% formData.forEach(function(form) { %>
+                    <tr>
+                      <td><%= form._id.toString().substring(0, 8) + '...' %></td>
+                      <td>
+                        <% let typeClass = 'badge-secondary'; %>
+                        <% if(form.formType === 'estudiante') { typeClass = 'badge-primary'; } %>
+                        <% if(form.formType === 'pago') { typeClass = 'badge-success'; } %>
+                        <% if(form.formType === 'inscripcion') { typeClass = 'badge-info'; } %>
+                        <span class="badge <%= typeClass %>"><%= form.formType %></span>
+                      </td>
+                      <td>
+                        <% if(form.estudiante) { %>
+                          <%= form.estudiante.nombres %> <%= form.estudiante.apellidos %>
+                          <small class="d-block text-muted"><%= form.estudiante.cedula %></small>
+                        <% } else { %>
+                          <span class="text-muted">No asociado</span>
+                        <% } %>
+                      </td>
+                      <td><%= form.createdBy ? form.createdBy.name || form.createdBy.username : 'Sistema' %></td>
+                      <td><%= new Date(form.createdAt).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }) %></td>
+                      <td>
+                        <% let statusClass = 'badge-secondary'; %>
+                        <% if(form.status === 'pendiente') { statusClass = 'badge-warning'; } %>
+                        <% if(form.status === 'procesado') { statusClass = 'badge-info'; } %>
+                        <% if(form.status === 'completado') { statusClass = 'badge-success'; } %>
+                        <% if(form.status === 'rechazado') { statusClass = 'badge-danger'; } %>
+                        <span class="badge <%= statusClass %>"><%= form.status %></span>
+                      </td>
+                      <td>
+                        <a href="/form-data/view/<%= form._id %>" class="btn btn-info btn-sm" title="Ver detalles">
+                          <i class="fas fa-eye"></i>
+                        </a>
+                        <button type="button" class="btn btn-danger btn-sm delete-form" data-toggle="modal" data-target="#deleteFormModal" data-id="<%= form._id %>" data-type="<%= form.formType %>" title="Eliminar">
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  <% }); %>
+                <% } else { %>
+                  <tr>
+                    <td colspan="7" class="text-center">No hay datos de formularios registrados</td>
+                  </tr>
+                <% } %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Modal de confirmación para eliminar formulario -->
+<div class="modal fade" id="deleteFormModal" tabindex="-1" role="dialog" aria-labelledby="deleteFormModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteFormModalLabel"><i class="fas fa-exclamation-triangle"></i> Confirmar eliminación</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro de que deseas eliminar este formulario?</p>
+        <p class="text-danger"><i class="fas fa-exclamation-circle"></i> Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        <a href="#" id="confirmDeleteBtn" class="btn btn-danger">Eliminar Formulario</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Inicializar DataTable
+    $('#formsTable').DataTable({
+      "responsive": true,
+      "lengthChange": true,
+      "autoWidth": false,
+      "language": {
+        "url": "//cdn.datatables.net/plug-ins/1.10.25/i18n/Spanish.json"
+      }
+    });
+    
+    // Manejar la eliminación de formularios
+    $('.delete-form').on('click', function() {
+      var formId = $(this).data('id');
+      var formType = $(this).data('type');
+      
+      $('#confirmDeleteBtn').attr('href', '/form-data/delete/' + formId);
+    });
+    
+    // Cargar estadísticas
+    loadStats();
+  });
+  
+  // Función para cargar estadísticas
+  function loadStats() {
+    fetch('/form-data/stats')
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          let totalForms = 0;
+          let pendingForms = 0;
+          let completedForms = 0;
+          let rejectedForms = 0;
+          
+          // Procesar estadísticas por estado
+          data.statusStats.forEach(stat => {
+            totalForms += stat.count;
+            
+            if (stat._id === 'pendiente') {
+              pendingForms = stat.count;
+            } else if (stat._id === 'completado') {
+              completedForms = stat.count;
+            } else if (stat._id === 'rechazado') {
+              rejectedForms = stat.count;
+            }
+          });
+          
+          // Actualizar contadores
+          document.getElementById('totalForms').textContent = totalForms;
+          document.getElementById('pendingForms').textContent = pendingForms;
+          document.getElementById('completedForms').textContent = completedForms;
+          document.getElementById('rejectedForms').textContent = rejectedForms;
+        }
+      })
+      .catch(error => {
+        console.error('Error al cargar estadísticas:', error);
+      });
+  }
+</script>
+
+<%- include('../partials/footer') %>
