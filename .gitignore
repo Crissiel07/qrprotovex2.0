@@ -1,0 +1,36 @@
+# Dependencias
+/node_modules
+
+# Archivos de entorno
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Directorios de caché
+.npm
+.eslintcache
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Directorios de cobertura
+/coverage
+
+# Directorios de construcción
+/build
+/dist
+
+# Archivos temporales
+*.tmp
+*.swp
+*.swo

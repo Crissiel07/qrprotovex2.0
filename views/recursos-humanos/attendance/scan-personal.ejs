@@ -1,0 +1,144 @@
+<!-- Vista para escaneo de QR de personal -->
+<h1 class="mt-4">Escaneo de Asistencia - Personal</h1>
+<p class="lead mb-4">Escanee el código QR del personal para registrar su entrada o salida</p>
+
+<div class="row">
+  <div class="col-md-6">
+    <div class="card mb-4">
+      <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0"><i class="fas fa-qrcode"></i> Escanear Código QR</h5>
+      </div>
+      <div class="card-body">
+        <div id="reader" class="mb-3"></div>
+        <div class="text-center">
+          <button id="startButton" class="btn btn-warning"><i class="fas fa-play"></i> Iniciar Escaneo</button>
+          <button id="stopButton" class="btn btn-secondary" style="display: none;"><i class="fas fa-stop"></i> Detener Escaneo</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="col-md-6">
+    <div class="card mb-4">
+      <div class="card-header bg-warning text-dark">
+        <h5 class="mb-0"><i class="fas fa-info-circle"></i> Resultado del Escaneo</h5>
+      </div>
+      <div class="card-body">
+        <div id="result" class="alert alert-info text-center">
+          Esperando escaneo de código QR...
+        </div>
+        <div id="employeeInfo" style="display: none;">
+          <div class="card">
+            <div class="card-body">
+              <h5 class="card-title" id="employeeName"></h5>
+              <p class="card-text">
+                <strong>Cédula:</strong> <span id="employeeCedula"></span><br>
+                <strong>Tipo:</strong> <span id="employeeType">Personal</span><br>
+                <strong>Acción:</strong> <span id="actionType"></span>
+              </p>
+              <div id="timeInfo">
+                <p><strong>Hora:</strong> <span id="currentTime"></span></p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="mt-3">
+  <a href="/recursos-humanos" class="btn btn-secondary mr-2"><i class="fas fa-arrow-left"></i> Volver a Recursos Humanos</a>
+  <a href="/recursos-humanos/attendance/history?type=personal" class="btn btn-warning"><i class="fas fa-history"></i> Ver Historial de Personal</a>
+</div>
+
+<script src="https://unpkg.com/html5-qrcode"></script>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    const html5QrCode = new Html5Qrcode("reader");
+    const startButton = document.getElementById('startButton');
+    const stopButton = document.getElementById('stopButton');
+    const resultDiv = document.getElementById('result');
+    const employeeInfoDiv = document.getElementById('employeeInfo');
+    const employeeNameSpan = document.getElementById('employeeName');
+    const employeeCedulaSpan = document.getElementById('employeeCedula');
+    const actionTypeSpan = document.getElementById('actionType');
+    const currentTimeSpan = document.getElementById('currentTime');
+    
+    let scanning = false;
+    
+    const qrCodeSuccessCallback = (decodedText, decodedResult) => {
+      if (scanning) {
+        html5QrCode.stop();
+        scanning = false;
+        startButton.style.display = 'inline-block';
+        stopButton.style.display = 'none';
+        
+        // Procesar el código QR
+        processQrCode(decodedText);
+      }
+    };
+    
+    const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+    
+    startButton.addEventListener('click', () => {
+      html5QrCode.start(
+        { facingMode: "environment" },
+        config,
+        qrCodeSuccessCallback
+      ).then(() => {
+        scanning = true;
+        startButton.style.display = 'none';
+        stopButton.style.display = 'inline-block';
+      }).catch((err) => {
+        resultDiv.innerHTML = `<div class="alert alert-danger">Error al iniciar la cámara: ${err}</div>`;
+      });
+    });
+    
+    stopButton.addEventListener('click', () => {
+      if (scanning) {
+        html5QrCode.stop();
+        scanning = false;
+        startButton.style.display = 'inline-block';
+        stopButton.style.display = 'none';
+      }
+    });
+    
+    function processQrCode(qrData) {
+      resultDiv.innerHTML = '<div class="alert alert-info">Procesando código QR...</div>';
+      
+      fetch('/recursos-humanos/attendance/process-scan-personal', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ qrData }),
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          resultDiv.innerHTML = `<div class="alert alert-success">${data.message}</div>`;
+          
+          // Mostrar información del empleado
+          employeeNameSpan.textContent = `${data.employee.nombres} ${data.employee.apellidos}`;
+          employeeCedulaSpan.textContent = data.employee.cedula;
+          actionTypeSpan.textContent = data.action === 'entrada' ? 'Entrada' : 'Salida';
+          
+          // Formatear y mostrar la hora actual
+          const now = new Date();
+          currentTimeSpan.textContent = now.toLocaleTimeString();
+          
+          employeeInfoDiv.style.display = 'block';
+        } else {
+          resultDiv.innerHTML = `<div class="alert alert-danger">${data.message}</div>`;
+          employeeInfoDiv.style.display = 'none';
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        resultDiv.innerHTML = '<div class="alert alert-danger">Error al procesar el código QR</div>';
+        employeeInfoDiv.style.display = 'none';
+      });
+    }
+  });
+</script>

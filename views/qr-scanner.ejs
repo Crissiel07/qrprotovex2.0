@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" data-theme="light">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,21 +7,109 @@
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css">
   <style>
+    :root {
+      --bg-color: #f8f9fa;
+      --text-color: #333;
+      --card-bg: #fff;
+      --border-color: #ddd;
+      --shadow-color: rgba(0,0,0,0.1);
+      --input-bg: #fff;
+      --input-border: #ced4da;
+      --manual-entry-bg: #f9f9f9;
+      --scan-feedback-bg: rgba(0, 0, 0, 0.7);
+      --scan-feedback-color: white;
+      --scan-overlay-border: rgba(255, 255, 255, 0.5);
+      --scan-success-border: rgba(40, 167, 69, 0.8);
+      --scan-warning-border: rgba(255, 193, 7, 0.8);
+      --scan-error-border: rgba(220, 53, 69, 0.8);
+      --btn-primary-bg: #007bff;
+      --btn-primary-color: #fff;
+      --transition-speed: 0.3s;
+      
+      /* Colores de texto específicos */
+      --text-white: #fff;
+      --text-light: #f8f9fa;
+      --text-dark: #343a40;
+      --text-muted: #6c757d;
+      --text-primary: #007bff;
+      --text-success: #28a745;
+      --text-info: #17a2b8;
+      --text-warning: #ffc107;
+      --text-danger: #dc3545;
+      
+      /* Colores de fondo específicos */
+      --bg-white: #fff;
+      --bg-light: #f8f9fa;
+      --bg-dark: #343a40;
+      --bg-primary: #007bff;
+      --bg-success: #28a745;
+      --bg-info: #17a2b8;
+      --bg-warning: #ffc107;
+      --bg-danger: #dc3545;
+    }
+    
+    [data-theme="dark"] {
+      --bg-color: #121212;
+      --text-color: #e0e0e0;
+      --card-bg: #1e1e1e;
+      --border-color: #444;
+      --shadow-color: rgba(0, 0, 0, 0.3);
+      --input-bg: #2d2d2d;
+      --input-border: #444;
+      --manual-entry-bg: #2d2d2d;
+      --scan-feedback-bg: rgba(0, 0, 0, 0.8);
+      --scan-feedback-color: #e0e0e0;
+      --scan-overlay-border: rgba(255, 255, 255, 0.5);
+      --scan-success-border: rgba(40, 167, 69, 0.8);
+      --scan-warning-border: rgba(255, 193, 7, 0.8);
+      --scan-error-border: rgba(220, 53, 69, 0.8);
+      --btn-primary-bg: #375a7f;
+      --btn-primary-color: #e0e0e0;
+      
+      /* Colores de texto específicos para modo oscuro */
+      --text-white: #e0e0e0;
+      --text-light: #e0e0e0;
+      --text-dark: #e0e0e0;
+      --text-muted: #adb5bd;
+      --text-primary: #4dabf7;
+      --text-success: #5dd879;
+      --text-info: #5bc0de;
+      --text-warning: #ffc107;
+      --text-danger: #f06a6a;
+      
+      /* Colores de fondo específicos para modo oscuro */
+      --bg-white: #1e1e1e;
+      --bg-light: #2d2d2d;
+      --bg-dark: #121212;
+      --bg-primary: #375a7f;
+      --bg-success: #2a9055;
+      --bg-info: #1a7088;
+      --bg-warning: #a17a0f;
+      --bg-danger: #a52834;
+    }
+    
     body {
       padding-top: 20px;
-      background-color: #f8f9fa;
+      background-color: var(--bg-color);
+      color: var(--text-color);
+      transition: background-color var(--transition-speed), color var(--transition-speed);
     }
     .card {
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      box-shadow: 0 4px 8px var(--shadow-color);
+      background-color: var(--card-bg);
+      transition: background-color var(--transition-speed), box-shadow var(--transition-speed);
     }
     #reader {
       width: 100%;
       max-width: 500px;
       min-height: 300px;
       margin: 0 auto;
-      border: 1px solid #ddd;
+      border: 1px solid var(--border-color);
       border-radius: 10px;
       overflow: hidden;
+      position: relative;
+      background-color: var(--card-bg);
+      transition: border-color var(--transition-speed), background-color var(--transition-speed);
     }
     #result {
       margin-top: 20px;
@@ -33,14 +121,156 @@
       display: none;
       margin-top: 20px;
       padding: 15px;
-      border: 1px solid #ddd;
+      border: 1px solid var(--border-color);
       border-radius: 10px;
-      background-color: #f9f9f9;
+      background-color: var(--manual-entry-bg);
+      transition: border-color var(--transition-speed), background-color var(--transition-speed);
+    }
+    /* Estilos para los indicadores de escaneo */
+    #scan-feedback {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background-color: var(--scan-feedback-bg);
+      color: var(--scan-feedback-color);
+      padding: 8px 15px;
+      font-size: 14px;
+      text-align: center;
+      transition: background-color var(--transition-speed), color var(--transition-speed);
+      z-index: 10;
+      display: none;
+    }
+    .scan-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border: 3px solid var(--scan-overlay-border);
+      pointer-events: none;
+      z-index: 10;
+      transition: border-color var(--transition-speed);
+    }
+    .scan-overlay.too-far {
+      border-color: #dc3545;
+      animation: pulse-red 1.5s infinite;
+    }
+    .scan-overlay.too-close {
+      border-color: #ffc107;
+      animation: pulse-yellow 1.5s infinite;
+    }
+    .scan-overlay.good-distance {
+      border-color: #28a745;
+      animation: pulse-green 1.5s infinite;
+    }
+    .scan-overlay.detecting {
+      border-color: #007bff;
+      animation: pulse-blue 0.8s infinite;
+    }
+    @keyframes pulse-red {
+      0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+    }
+    @keyframes pulse-yellow {
+      0% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(255, 193, 7, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 193, 7, 0); }
+    }
+    @keyframes pulse-green {
+      0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+    }
+    @keyframes pulse-blue {
+      0% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0.7); }
+      70% { box-shadow: 0 0 0 10px rgba(0, 123, 255, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(0, 123, 255, 0); }
+    }
+    /* Indicador de guía para posicionar el QR */
+    .qr-guide {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 180px;
+      height: 180px;
+      border: 2px dashed rgba(255, 255, 255, 0.5);
+      border-radius: 10px;
+      pointer-events: none;
+      z-index: 8;
+      display: none;
+    }
+    .qr-guide::before {
+      content: "Coloque el QR aquí";
+      position: absolute;
+      top: -25px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      color: white;
+      font-size: 12px;
+      background-color: rgba(0, 0, 0, 0.6);
+      padding: 3px;
+      border-radius: 4px;
+    }
+    .theme-switch i {
+      font-size: 1.2rem;
+    }
+    
+    /* Corregir textos blancos en modo oscuro */
+    .text-white, .text-light {
+      color: var(--text-white) !important;
+    }
+    
+    /* Corregir fondos */
+    .bg-white {
+      background-color: var(--bg-white) !important;
+    }
+    
+    .bg-light {
+      background-color: var(--bg-light) !important;
+    }
+    
+    /* Corregir textos de colores */
+    .text-primary {
+      color: var(--text-primary) !important;
+    }
+    
+    .text-success {
+      color: var(--text-success) !important;
+    }
+    
+    .text-info {
+      color: var(--text-info) !important;
+    }
+    
+    .text-warning {
+      color: var(--text-warning) !important;
+    }
+    
+    .text-danger {
+      color: var(--text-danger) !important;
+    }
+    
+    .text-dark {
+      color: var(--text-dark) !important;
+    }
+    
+    .text-muted {
+      color: var(--text-muted) !important;
     }
   </style>
 </head>
 <body>
   <div class="container">
+    <!-- Botón para cambiar tema -->
+    <div class="d-flex justify-content-end mb-3">
+      <button class="theme-switch" id="themeToggle" title="Cambiar tema">
+        <i class="fas fa-moon"></i>
+      </button>
+    </div>
     <div class="row mb-4">
       <div class="col-md-12 text-center">
         <h1>Escáner de Códigos QR</h1>
@@ -57,7 +287,12 @@
           <div class="card-body">
             <!-- Contenedor del lector QR -->
             <div id="reader-container">
-              <div id="reader"></div>
+              <div id="reader">
+                <!-- Elementos de feedback visual -->
+                <div class="scan-overlay" id="scan-overlay"></div>
+                <div class="qr-guide" id="qr-guide"></div>
+                <div id="scan-feedback"></div>
+              </div>
               
               <div class="d-flex justify-content-center mt-3">
                 <button id="start-button" class="btn btn-primary mr-2">
@@ -102,6 +337,37 @@
   
   <script>
     document.addEventListener('DOMContentLoaded', function() {
+      // Gestión del tema oscuro/claro
+      const themeToggle = document.getElementById('themeToggle');
+      const themeIcon = themeToggle.querySelector('i');
+      const htmlElement = document.documentElement;
+      
+      // Verificar si hay un tema guardado en localStorage
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme) {
+        htmlElement.setAttribute('data-theme', savedTheme);
+        updateThemeIcon(savedTheme);
+      }
+      
+      // Cambiar tema al hacer clic en el botón
+      themeToggle.addEventListener('click', function() {
+        const currentTheme = htmlElement.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        
+        htmlElement.setAttribute('data-theme', newTheme);
+        localStorage.setItem('theme', newTheme);
+        
+        updateThemeIcon(newTheme);
+      });
+      
+      // Actualizar el icono según el tema
+      function updateThemeIcon(theme) {
+        if (theme === 'dark') {
+          themeIcon.className = 'fas fa-sun';
+        } else {
+          themeIcon.className = 'fas fa-moon';
+        }
+      }
       const startButton = document.getElementById('start-button');
       const stopButton = document.getElementById('stop-button');
       const manualButton = document.getElementById('manual-button');
@@ -113,9 +379,16 @@
       const resultDiv = document.getElementById('result');
       const resultTitle = document.getElementById('result-title');
       const resultContent = document.getElementById('result-content');
+      const scanOverlay = document.getElementById('scan-overlay');
+      const scanFeedback = document.getElementById('scan-feedback');
+      const qrGuide = document.getElementById('qr-guide');
       
       let html5QrCode;
       let cameraError = false;
+      let lastFeedbackTime = 0;
+      let feedbackTimeout;
+      let qrDetectionCount = 0;
+      let scanActive = false;
       
       // Botón para mostrar entrada manual
       manualButton.addEventListener('click', function() {
@@ -146,6 +419,14 @@
       startButton.addEventListener('click', function() {
         // Ocultar cualquier resultado anterior
         resultDiv.style.display = 'none';
+        
+        // Activar el modo de escaneo
+        scanActive = true;
+        
+        // Mostrar la guía de posicionamiento
+        qrGuide.style.display = 'block';
+        scanFeedback.textContent = 'Preparando cámara...';
+        scanFeedback.style.display = 'block';
         
         // Crear nueva instancia del escáner
         html5QrCode = new Html5Qrcode("reader");
@@ -271,6 +552,12 @@
               console.log('Escáner QR detenido');
               startButton.disabled = false;
               stopButton.disabled = true;
+              
+              // Desactivar el modo de escaneo
+              scanActive = false;
+              
+              // Limpiar el feedback visual
+              clearFeedbackState();
             })
             .catch((err) => {
               console.error('Error al detener el escáner QR:', err);
@@ -278,26 +565,55 @@
         }
       });
       
-      // Función cuando se detecta un código QR
-      function onScanSuccess(decodedText, decodedResult) {
-        console.log(`Código escaneado: ${decodedText}`, decodedResult);
+      // Función para limpiar el estado del feedback visual
+      function clearFeedbackState() {
+        if (feedbackTimeout) {
+          clearTimeout(feedbackTimeout);
+          feedbackTimeout = null;
+        }
+        scanOverlay.className = 'scan-overlay';
+        scanFeedback.style.display = 'none';
+        qrGuide.style.display = 'none';
+        qrDetectionCount = 0;
+      }
+      
+      // Función para mostrar feedback sobre la posición de la cámara
+      function showScanFeedback(message, state) {
+        // Limitar la frecuencia de actualización del feedback (máximo cada 500ms)
+        const now = Date.now();
+        if (now - lastFeedbackTime < 500) return;
+        lastFeedbackTime = now;
         
-        // Detener el escáner después de un escaneo exitoso
-        if (html5QrCode && html5QrCode.isScanning) {
-          html5QrCode.stop()
-            .then(() => {
-              console.log('Escáner QR detenido después de escaneo exitoso');
-              startButton.disabled = false;
-              stopButton.disabled = true;
-            })
-            .catch((err) => {
-              console.error('Error al detener el escáner QR:', err);
-            });
+        // Actualizar el mensaje y el estado visual
+        scanFeedback.textContent = message;
+        scanFeedback.style.display = 'block';
+        
+        // Actualizar el estado visual del borde
+        scanOverlay.className = 'scan-overlay';
+        if (state) {
+          scanOverlay.classList.add(state);
         }
         
-        // Mostrar información temporal
-        showMessage('Verificando código...', 'info');
+        // Mostrar la guía de posicionamiento
+        qrGuide.style.display = 'block';
+      }
+      
+      // Función cuando se detecta un código QR
+      function onScanSuccess(decodedText, decodedResult) {
+        // Limpiar cualquier feedback visual
+        clearFeedbackState();
         
+        // Detener el escáner después de un escaneo exitoso
+        html5QrCode.stop().then(() => {
+          console.log('Escáner detenido después de escaneo exitoso');
+          startButton.disabled = false;
+          stopButton.disabled = true;
+          scanActive = false;
+        }).catch(err => {
+          console.error('Error al detener el escáner:', err);
+        });
+        
+        // Verificar el código escaneado
         verifyCode(decodedText);
       }
       
@@ -336,9 +652,62 @@
           });
       }
       
-      // Función cuando hay un error en el escaneo
+      // Función para manejar errores de escaneo
       function onScanFailure(error) {
-        // No mostramos errores de escaneo continuos
+        // Solo procesar si el escaneo sigue activo
+        if (!scanActive) return;
+        
+        // Analizar la imagen para dar feedback
+        if (html5QrCode && html5QrCode._lastImageCapture) {
+          const img = html5QrCode._lastImageCapture;
+          
+          // Detectar si hay un posible código QR en la imagen
+          if (error && error.message && error.message.includes('not found')) {
+            // No se detectó ningún código QR
+            qrDetectionCount = 0;
+            
+            // Analizar el brillo de la imagen para dar consejos
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = img.width;
+            canvas.height = img.height;
+            ctx.drawImage(img, 0, 0);
+            
+            try {
+              // Obtener datos de la imagen para analizar brillo
+              const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+              const data = imageData.data;
+              let brightness = 0;
+              
+              // Calcular brillo promedio (muestreo rápido)
+              for (let i = 0; i < data.length; i += 20) {
+                brightness += (data[i] + data[i + 1] + data[i + 2]) / 3;
+              }
+              brightness = brightness / (data.length / 20);
+              
+              // Dar feedback basado en el brillo
+              if (brightness < 50) {
+                showScanFeedback('Hay poca luz. Acerque el QR a una fuente de luz.', 'too-far');
+              } else if (brightness > 200) {
+                showScanFeedback('Demasiado brillo. Intente reducir la luz o cambiar el ángulo.', 'too-close');
+              } else {
+                // Si el brillo es adecuado, dar consejos de posicionamiento
+                showScanFeedback('Coloque el código QR dentro del recuadro.', 'too-far');
+              }
+            } catch (e) {
+              console.error('Error al analizar imagen:', e);
+            }
+          } else {
+            // Posible detección parcial de QR
+            qrDetectionCount++;
+            
+            if (qrDetectionCount > 5) {
+              showScanFeedback('Código QR detectado parcialmente. Ajuste la distancia.', 'detecting');
+            } else if (qrDetectionCount > 2) {
+              showScanFeedback('Mantenga firme la cámara, estamos enfocando...', 'good-distance');
+            }
+          }
+        }
       }
       
       // Mostrar error
@@ -374,18 +743,29 @@
           resultTitle.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Validación Pendiente';
         }
         
+        // Preparar la imagen del estudiante
+        const fotoHtml = data.foto 
+          ? `<div class="text-center mb-3">
+               <img src="${data.foto}" alt="Foto de ${data.nombres}" class="img-thumbnail" style="max-height: 200px; cursor: pointer;" onclick="openImageModal('${data.foto}', '${data.nombres} ${data.apellidos}')">
+               <small class="d-block text-muted mt-1"><i class="fas fa-search-plus"></i> Click para ampliar</small>
+             </div>` 
+          : '';
+        
         // Construir el contenido del resultado
         let content = `
-          <p><strong>Nombre:</strong> ${data.nombres} ${data.apellidos}</p>
-          <p><strong>Cédula:</strong> ${data.cedula}</p>
-          <p><strong>Carrera:</strong> ${data.carrera || 'No especificada'}</p>
-          
-          <div class="mt-3 ${data.validacionAprobada ? 'bg-success' : 'bg-warning'} text-white p-2 rounded">
-            <h5>Estado de Validación: <span class="badge badge-${data.validacionAprobada ? 'light' : 'danger'}">${data.validacionAprobada ? 'APROBADO' : 'PENDIENTE'}</span></h5>
-            <p>${data.mensajeValidacion}</p>
+          ${fotoHtml}
+          <div class="row">
+            <div class="col-md-${data.foto ? '8' : '12'}">
+              <p><strong>Nombre:</strong> ${data.nombres} ${data.apellidos}</p>
+              <p><strong>Cédula:</strong> ${data.cedula}</p>
+              <p><strong>Carrera:</strong> ${data.carrera || 'No especificada'}</p>
+              
+              <div class="mt-3 ${data.validacionAprobada ? 'bg-success' : 'bg-warning'} text-white p-2 rounded">
+                <h5>Estado de Validación: <span class="badge badge-${data.validacionAprobada ? 'light' : 'danger'}">${data.validacionAprobada ? 'APROBADO' : 'PENDIENTE'}</span></h5>
+                <p>${data.mensajeValidacion}</p>
+              </div>
+            </div>
           </div>
-          
-         
           
           <div class="mt-3 mb-2">
             <button class="btn btn-primary btn-sm" onclick="window.location.reload()">
@@ -398,6 +778,34 @@
         resultDiv.style.display = 'block';
       }
     });
+  </script>
+  <!-- Modal para mostrar la imagen en tamaño completo -->
+  <div class="modal fade" id="imageModal" tabindex="-1" role="dialog" aria-labelledby="imageModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="imageModalLabel"><i class="fas fa-id-card mr-2"></i> Foto del Estudiante</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body text-center">
+          <img id="modalImage" src="" alt="Foto del estudiante" class="img-fluid">
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Cerrar</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Función para abrir el modal con la imagen
+    function openImageModal(imageSrc, studentName) {
+      document.getElementById('modalImage').src = imageSrc;
+      document.getElementById('imageModalLabel').innerHTML = `<i class="fas fa-id-card mr-2"></i> Foto de ${studentName}`;
+      $('#imageModal').modal('show');
+    }
   </script>
 </body>
 </html> 

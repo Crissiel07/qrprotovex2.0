@@ -3,21 +3,31 @@ const router = express.Router();
 const { isAuthenticated, isRecursosHumanos } = require('../middleware/auth');
 const Employee = require('../models/Employee');
 const AttendanceRecord = require('../models/AttendanceRecord');
+const PersonalAttendanceRecord = require('../models/PersonalAttendanceRecord');
 
-// Ruta para la pu00e1gina de escaneo de QR
+// Ruta para la página de escaneo de QR de profesores
 router.get('/scan', isAuthenticated, (req, res) => {
   res.render('recursos-humanos/attendance/scan', {
-    user: req.session.user
+    user: req.session.user,
+    tipoEmpleado: 'Profesor'
   });
 });
 
-// Ruta para procesar el escaneo de QR
+// Ruta para la página de escaneo de QR de personal
+router.get('/scan-personal', isAuthenticated, (req, res) => {
+  res.render('recursos-humanos/attendance/scan-personal', {
+    user: req.session.user,
+    tipoEmpleado: 'Personal'
+  });
+});
+
+// Ruta para procesar el escaneo de QR de profesores
 router.post('/process-scan', isAuthenticated, async (req, res) => {
   try {
     const { qrData } = req.body;
     
     if (!qrData) {
-      return res.status(400).json({ success: false, message: 'No se proporcionu00f3 datos del QR' });
+      return res.status(400).json({ success: false, message: 'No se proporcionó datos del QR' });
     }
     
     // Parsear los datos del QR
@@ -25,18 +35,23 @@ router.post('/process-scan', isAuthenticated, async (req, res) => {
     try {
       qrInfo = JSON.parse(qrData);
     } catch (error) {
-      return res.status(400).json({ success: false, message: 'Formato de QR invu00e1lido' });
+      return res.status(400).json({ success: false, message: 'Formato de QR inválido' });
     }
     
     // Verificar que sea un QR de empleado
     if (!qrInfo.id || !qrInfo.cedula || qrInfo.tipo !== 'empleado') {
-      return res.status(400).json({ success: false, message: 'Cu00f3digo QR no vu00e1lido para registro de asistencia' });
+      return res.status(400).json({ success: false, message: 'Código QR no válido para registro de asistencia' });
     }
     
     // Buscar el empleado
     const employee = await Employee.findById(qrInfo.id);
     if (!employee) {
       return res.status(404).json({ success: false, message: 'Empleado no encontrado' });
+    }
+    
+    // Verificar que sea un profesor
+    if (employee.tipoEmpleado !== 'Profesor') {
+      return res.status(400).json({ success: false, message: 'Este QR corresponde a personal, no a un profesor' });
     }
     
     // Verificar si ya tiene un registro de entrada sin salida
@@ -108,38 +123,155 @@ router.post('/process-scan', isAuthenticated, async (req, res) => {
   }
 });
 
-// Ruta para ver historial de asistencia
+// Ruta para procesar el escaneo de QR de personal
+router.post('/process-scan-personal', isAuthenticated, async (req, res) => {
+  try {
+    const { qrData } = req.body;
+    
+    if (!qrData) {
+      return res.status(400).json({ success: false, message: 'No se proporcionó datos del QR' });
+    }
+    
+    // Parsear los datos del QR
+    let qrInfo;
+    try {
+      qrInfo = JSON.parse(qrData);
+    } catch (error) {
+      return res.status(400).json({ success: false, message: 'Formato de QR inválido' });
+    }
+    
+    // Verificar que sea un QR de empleado
+    if (!qrInfo.id || !qrInfo.cedula || qrInfo.tipo !== 'empleado') {
+      return res.status(400).json({ success: false, message: 'Código QR no válido para registro de asistencia' });
+    }
+    
+    // Buscar el empleado
+    const employee = await Employee.findById(qrInfo.id);
+    if (!employee) {
+      return res.status(404).json({ success: false, message: 'Empleado no encontrado' });
+    }
+    
+    // Verificar que sea personal
+    if (employee.tipoEmpleado !== 'Personal') {
+      return res.status(400).json({ success: false, message: 'Este QR corresponde a un profesor, no a personal' });
+    }
+    
+    // Verificar si ya tiene un registro de entrada sin salida
+    const pendingRecord = await PersonalAttendanceRecord.findOne({
+      employee: employee._id,
+      status: 'entrada',
+      exitTime: null
+    }).sort({ entryTime: -1 });
+    
+    const now = new Date();
+    const currentWeek = getWeekNumber(now);
+    const currentMonth = now.getMonth() + 1; // getMonth() devuelve 0-11
+    const currentYear = now.getFullYear();
+    
+    if (pendingRecord) {
+      // Registrar salida
+      pendingRecord.exitTime = now;
+      pendingRecord.status = 'salida';
+      await pendingRecord.save();
+      
+      return res.json({
+        success: true,
+        action: 'salida',
+        message: `Salida registrada para ${employee.nombres} ${employee.apellidos}`,
+        employee: {
+          id: employee._id,
+          cedula: employee.cedula,
+          nombres: employee.nombres,
+          apellidos: employee.apellidos
+        },
+        record: {
+          entryTime: pendingRecord.entryTime,
+          exitTime: pendingRecord.exitTime,
+          hoursWorked: pendingRecord.hoursWorked
+        }
+      });
+    } else {
+      // Registrar entrada
+      const newRecord = new PersonalAttendanceRecord({
+        employee: employee._id,
+        entryTime: now,
+        status: 'entrada',
+        week: currentWeek,
+        month: currentMonth,
+        year: currentYear
+      });
+      
+      await newRecord.save();
+      
+      return res.json({
+        success: true,
+        action: 'entrada',
+        message: `Entrada registrada para ${employee.nombres} ${employee.apellidos}`,
+        employee: {
+          id: employee._id,
+          cedula: employee.cedula,
+          nombres: employee.nombres,
+          apellidos: employee.apellidos
+        },
+        record: {
+          entryTime: newRecord.entryTime
+        }
+      });
+    }
+    
+  } catch (error) {
+    console.error('Error al procesar escaneo de QR:', error);
+    return res.status(500).json({ success: false, message: 'Error al procesar el escaneo' });
+  }
+});
+
+// Ruta para ver historial de asistencia de profesores
 router.get('/history', isAuthenticated, isRecursosHumanos, async (req, res) => {
   try {
-    // Paru00e1metros de filtro
+    // Parámetros de filtro
     const employeeId = req.query.employee || null;
     const period = req.query.period || 'week';
     const value = req.query.value || getCurrentPeriodValue(period);
+    const type = req.query.type || 'profesor';
     
-    // Obtener todos los empleados para el selector
-    const employees = await Employee.find({ estado: 'Activo' }).sort({ apellidos: 1 });
+    // Obtener todos los empleados para el selector según el tipo
+    const employees = await Employee.find({ 
+      estado: 'Activo',
+      tipoEmpleado: type === 'personal' ? 'Personal' : 'Profesor'
+    }).sort({ apellidos: 1 });
     
-    // Si no se seleccionu00f3 un empleado, mostrar la lista de empleados
+    // Si no se seleccionó un empleado, mostrar la lista de empleados
     if (!employeeId) {
       return res.render('recursos-humanos/attendance/history', {
         user: req.session.user,
         employees,
         records: [],
         stats: null,
-        filters: { employeeId, period, value },
-        periodName: getPeriodName(period, value)
+        filters: { employeeId, period, value, type },
+        periodName: getPeriodName(period, value),
+        tipoEmpleado: type === 'personal' ? 'Personal' : 'Profesor'
       });
     }
     
+    // Verificar el tipo de empleado
+    const selectedEmployee = await Employee.findById(employeeId);
+    if (!selectedEmployee) {
+      req.flash('error_msg', 'Empleado no encontrado');
+      return res.redirect('/recursos-humanos');
+    }
+    
+    // Determinar qué modelo usar según el tipo
+    const RecordModel = type === 'personal' ? PersonalAttendanceRecord : AttendanceRecord;
+    
     // Buscar los registros de asistencia
-    const records = await AttendanceRecord.find({
+    const records = await RecordModel.find({
       employee: employeeId,
       ...(period === 'week' ? { week: value, year: new Date().getFullYear() } : {}),
       ...(period === 'month' ? { month: value, year: new Date().getFullYear() } : {}),
       ...(period === 'year' ? { year: value } : {})
     }).sort({ entryTime: -1 });
     
-    // Calcular estadu00edsticas
+    // Calcular estadísticas
     let totalHours = 0;
     let completedDays = 0;
     let incompleteDays = 0;
@@ -160,17 +292,18 @@ router.get('/history', isAuthenticated, isRecursosHumanos, async (req, res) => {
       totalDays: completedDays + incompleteDays
     };
     
-    // Obtener informaciu00f3n del empleado seleccionado
-    const selectedEmployee = await Employee.findById(employeeId);
+    // Renderizar la vista correspondiente según el tipo de empleado
+    const viewTemplate = type === 'personal' ? 'recursos-humanos/attendance/history-personal' : 'recursos-humanos/attendance/history';
     
-    res.render('recursos-humanos/attendance/history', {
+    res.render(viewTemplate, {
       user: req.session.user,
       employees,
       selectedEmployee,
       records,
       stats,
-      filters: { employeeId, period, value },
-      periodName: getPeriodName(period, value)
+      filters: { employeeId, period, value, type },
+      periodName: getPeriodName(period, value),
+      tipoEmpleado: type === 'personal' ? 'Personal' : 'Profesor'
     });
     
   } catch (error) {

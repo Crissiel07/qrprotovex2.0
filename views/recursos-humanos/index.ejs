@@ -15,7 +15,17 @@
                 <i class="fas fa-user-tie fa-3x mb-3 text-primary"></i>
                 <h5>Empleados</h5>
                 <p>Gestiona la información de empleados</p>
-                <a href="/recursos-humanos/empleados" class="btn btn-primary">Gestionar Empleados</a>
+                <div class="mb-2">
+                  <a href="/recursos-humanos/empleados" class="btn btn-primary btn-block">Gestionar Empleados</a>
+                </div>
+                <div class="btn-group btn-block">
+                  <a href="/recursos-humanos/empleados/create-profesor" class="btn btn-outline-primary">
+                    <i class="fas fa-chalkboard-teacher"></i> Nuevo Profesor
+                  </a>
+                  <a href="/recursos-humanos/empleados/create-personal" class="btn btn-outline-warning">
+                    <i class="fas fa-user-tie"></i> Nuevo Personal
+                  </a>
+                </div>
               </div>
             </div>
           </div>
@@ -31,11 +41,39 @@
           </div>
           <div class="col-md-4 mb-3">
             <div class="card">
+              <div class="card-header bg-info text-white">
+                <h5 class="m-0">Asistencia Profesores</h5>
+              </div>
               <div class="card-body text-center">
-                <i class="fas fa-calendar-alt fa-3x mb-3 text-info"></i>
-                <h5>Asistencia</h5>
-                <p>Control de asistencia y horarios</p>
-                <a href="/recursos-humanos/attendance/scan" class="btn btn-info">Control de Asistencia</a>
+                <i class="fas fa-chalkboard-teacher fa-3x mb-3 text-info"></i>
+                <p>Control de asistencia de profesores</p>
+                <div class="d-flex flex-column">
+                  <a href="/recursos-humanos/attendance/scan" class="btn btn-info mb-2">
+                    <i class="fas fa-qrcode mr-1"></i> Registrar Asistencia
+                  </a>
+                  <a href="/recursos-humanos/attendance/history?type=profesor" class="btn btn-outline-info">
+                    <i class="fas fa-history mr-1"></i> Ver Historial
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-4 mb-3">
+            <div class="card">
+              <div class="card-header bg-warning text-dark">
+                <h5 class="m-0">Asistencia Personal</h5>
+              </div>
+              <div class="card-body text-center">
+                <i class="fas fa-user-tie fa-3x mb-3 text-warning"></i>
+                <p>Control de asistencia del personal</p>
+                <div class="d-flex flex-column">
+                  <a href="/recursos-humanos/attendance/scan-personal" class="btn btn-warning mb-2">
+                    <i class="fas fa-qrcode mr-1"></i> Registrar Asistencia
+                  </a>
+                  <a href="/recursos-humanos/attendance/history?type=personal" class="btn btn-outline-warning">
+                    <i class="fas fa-history mr-1"></i> Ver Historial
+                  </a>
+                </div>
               </div>
             </div>
           </div>

@@ -1,48 +1,49 @@
 <div class="container-fluid px-0">
   <div class="row">
     <div class="col-12">
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
+      <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center mb-4">
+        <div class="mb-3 mb-md-0">
           <h1 class="h3 mb-2 text-gray-800">Control de Asistencia</h1>
-          <p class="mb-0 text-muted">Escanee el cu00f3digo QR del empleado para registrar entrada o salida</p>
+          <p class="mb-0 text-muted">Escanee el código QR del empleado para registrar entrada o salida</p>
         </div>
-        <a href="/recursos-humanos/attendance/history" class="btn btn-info">
-          <i class="fas fa-history mr-1"></i> Ver Historial
-        </a>
+        <div class="mt-3">
+          <a href="/recursos-humanos" class="btn btn-secondary mr-2"><i class="fas fa-arrow-left"></i> Volver a Recursos Humanos</a>
+          <a href="/recursos-humanos/attendance/history?type=profesor" class="btn btn-info"><i class="fas fa-history"></i> Ver Historial de Profesores</a>
+        </div>
       </div>
     </div>
   </div>
 
   <div class="row">
-    <div class="col-lg-7">
+    <div class="col-lg-7 order-2 order-lg-1">
       <div class="card shadow mb-4 border-left-primary">
-        <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-          <h6 class="m-0 font-weight-bold text-primary">
-            <i class="fas fa-qrcode mr-1"></i> Escaner de Cu00f3digo QR
+        <div class="card-header py-3 d-flex flex-column flex-sm-row align-items-start align-items-sm-center justify-content-between">
+          <h6 class="m-0 font-weight-bold text-primary mb-2 mb-sm-0">
+            <i class="fas fa-qrcode mr-1"></i> Escaner de Código QR
           </h6>
-          <div class="dropdown no-arrow">
-            <button id="startButton" class="btn btn-sm btn-success mr-2">
+          <div class="btn-group btn-group-sm">
+            <button id="startButton" class="btn btn-success mr-2">
               <i class="fas fa-play mr-1"></i> Iniciar Escaneo
             </button>
-            <button id="stopButton" class="btn btn-sm btn-danger mr-2" disabled>
+            <button id="stopButton" class="btn btn-danger mr-2" disabled>
               <i class="fas fa-stop mr-1"></i> Detener
             </button>
-            <button id="resetButton" class="btn btn-sm btn-secondary">
+            <button id="resetButton" class="btn btn-secondary">
               <i class="fas fa-sync-alt mr-1"></i> Reiniciar
             </button>
           </div>
         </div>
         <div class="card-body">
-          <div id="reader" class="mb-3" style="width: 100%;"></div>
+          <div id="reader" class="mb-3 mx-auto" style="width: 100%; max-width: 500px; min-height: 300px;"></div>
           
           <div class="alert alert-info bg-light-info border-0">
-            <div class="d-flex">
-              <div class="mr-3">
+            <div class="d-flex flex-column flex-sm-row">
+              <div class="mr-sm-3 mb-2 mb-sm-0 text-center text-sm-left">
                 <i class="fas fa-info-circle fa-2x text-info"></i>
               </div>
               <div>
                 <h5 class="alert-heading text-info">Instrucciones</h5>
-                <p class="mb-0">Coloque el cu00f3digo QR del empleado frente a la cu00e1mara. El sistema registraru00e1 automau00e1ticamente la entrada o salida segu00fan corresponda.</p>
+                <p class="mb-0">Coloque el código QR del empleado frente a la cámara. El sistema registrará automáticamente la entrada o salida según corresponda.</p>
               </div>
             </div>
           </div>
@@ -50,7 +51,7 @@
       </div>
     </div>
     
-    <div class="col-lg-5">
+    <div class="col-lg-5 order-1 order-lg-2 mb-4 mb-lg-0">
       <div class="card shadow mb-4 border-left-success">
         <div class="card-header py-3">
           <h6 class="m-0 font-weight-bold text-success">
@@ -63,7 +64,7 @@
               <i class="fas fa-qrcode fa-4x text-muted"></i>
             </div>
             <h5 class="text-muted">Esperando escaneo...</h5>
-            <p class="text-muted">El resultado del escaneo se mostraru00e1 aquu00ed</p>
+            <p class="text-muted">El resultado del escaneo se mostrará aquí</p>
           </div>
           
           <div id="successResult" class="d-none">
@@ -78,7 +79,7 @@
               <div class="card-body">
                 <h6 class="font-weight-bold mb-3">Datos del Empleado:</h6>
                 <div class="row mb-2">
-                  <div class="col-5 font-weight-bold text-muted">Cu00e9dula:</div>
+                  <div class="col-5 font-weight-bold text-muted">Cédula:</div>
                   <div class="col-7" id="employeeCedula"></div>
                 </div>
                 <div class="row mb-2">
@@ -112,13 +113,13 @@
       <div class="card shadow mb-4 border-left-info">
         <div class="card-header py-3">
           <h6 class="m-0 font-weight-bold text-info">
-            <i class="fas fa-clock mr-1"></i> u00daltimos Registros
+            <i class="fas fa-clock mr-1"></i> Últimos Registros
           </h6>
         </div>
         <div class="card-body p-0">
           <div id="recentRecords">
             <div class="text-center py-4">
-              <p class="text-muted">Los u00faltimos registros se mostraru00e1n aquu00ed</p>
+              <p class="text-muted">Los últimos registros se mostrarán aquí</p>
             </div>
           </div>
         </div>
@@ -127,7 +128,7 @@
   </div>
 </div>
 
-<!-- Incluir la libreu00eda HTML5-QRCode -->
+<!-- Incluir la librería HTML5-QRCode -->
 <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
 <script>
@@ -158,15 +159,32 @@
       html5QrCode = new Html5Qrcode("reader");
       
       const qrCodeSuccessCallback = (decodedText, decodedResult) => {
-        // Procesar el cu00f3digo QR sin detener el escaneo
+        // Procesar el código QR sin detener el escaneo
         processQRCode(decodedText);
       };
       
-      const config = { fps: 10, qrbox: { width: 250, height: 250 } };
+      // Configuración adaptativa para el escaner QR
+      const config = { 
+        fps: 10, 
+        qrbox: { width: 250, height: 250 },
+        aspectRatio: 1.0,
+        formatsToSupport: [ Html5QrcodeSupportedFormats.QR_CODE ],
+        rememberLastUsedCamera: true
+      };
       
-      // Iniciar el escaneo con la cu00e1mara
+      // Iniciar el escaneo con la cámara
       startButton.addEventListener('click', () => {
         if (!isScanning) {
+          // Mostrar mensaje de carga
+          scanResult.innerHTML = `
+            <div class="mb-3">
+              <i class="fas fa-spinner fa-spin fa-4x text-primary"></i>
+            </div>
+            <h5 class="text-primary">Iniciando cámara...</h5>
+            <p class="text-muted">Por favor espere mientras se accede a la cámara</p>
+          `;
+          
+          // Primero intentar con la cámara trasera (environment)
           html5QrCode.start(
             { facingMode: "environment" },
             config,
@@ -180,11 +198,37 @@
                 <i class="fas fa-qrcode fa-4x text-success"></i>
               </div>
               <h5 class="text-success">Escaneo activo</h5>
-              <p class="text-muted">Acerque el cu00f3digo QR a la cu00e1mara</p>
+              <p class="text-muted">Acerque el código QR a la cámara</p>
             `;
           }).catch(err => {
-            console.error('Error al iniciar el escaneo:', err);
-            showErrorResult('Error al iniciar la cu00e1mara. Por favor, verifique los permisos e intente nuevamente.');
+            console.error('Error al iniciar con cámara trasera, intentando con cualquier cámara:', err);
+            
+            // Si falla, intentar con cualquier cámara disponible
+            html5QrCode.start(
+              { facingMode: "user" }, // Intentar con cámara frontal
+              config,
+              qrCodeSuccessCallback
+            ).then(() => {
+              isScanning = true;
+              startButton.disabled = true;
+              stopButton.disabled = false;
+              scanResult.innerHTML = `
+                <div class="mb-3">
+                  <i class="fas fa-qrcode fa-4x text-success"></i>
+                </div>
+                <h5 class="text-success">Escaneo activo</h5>
+                <p class="text-muted">Acerque el código QR a la cámara</p>
+              `;
+            }).catch(err => {
+              console.error('Error al iniciar escáner:', err);
+              scanResult.innerHTML = `
+                <div class="mb-3">
+                  <i class="fas fa-exclamation-triangle fa-4x text-danger"></i>
+                </div>
+                <h5 class="text-danger">Error al iniciar la cámara</h5>
+                <p class="text-muted">No se pudo acceder a la cámara. Por favor verifique los permisos e intente nuevamente.</p>
+              `;
+            });
           });
         }
       });
@@ -201,29 +245,50 @@
                 <i class="fas fa-qrcode fa-4x text-muted"></i>
               </div>
               <h5 class="text-muted">Escaneo detenido</h5>
-              <p class="text-muted">Presione 'Iniciar Escaneo' para continuar</p>
+              <p class="text-muted">Presione "Iniciar Escaneo" para continuar</p>
             `;
-          }).catch(error => {
-            console.error('Error al detener el escaneo:', error);
+          }).catch(err => {
+            console.error('Error al detener el escáner:', err);
           });
         }
       });
       
-      // Reiniciar el escaner
+      // Reiniciar el escaneo
       resetButton.addEventListener('click', () => {
         if (isScanning) {
           html5QrCode.stop().then(() => {
-            resetUI();
-          }).catch(error => {
-            console.error('Error al detener el escaneo:', error);
+            isScanning = false;
+            startButton.disabled = false;
+            stopButton.disabled = true;
+            scanResult.innerHTML = `
+              <div class="mb-3">
+                <i class="fas fa-qrcode fa-4x text-muted"></i>
+              </div>
+              <h5 class="text-muted">Esperando escaneo...</h5>
+              <p class="text-muted">El resultado del escaneo se mostrará aquí</p>
+            `;
+            successResult.classList.add('d-none');
+            errorResult.classList.add('d-none');
+            scanResult.classList.remove('d-none');
+          }).catch(err => {
+            console.error('Error al reiniciar el escáner:', err);
           });
         } else {
-          resetUI();
+          scanResult.innerHTML = `
+            <div class="mb-3">
+              <i class="fas fa-qrcode fa-4x text-muted"></i>
+            </div>
+            <h5 class="text-muted">Esperando escaneo...</h5>
+            <p class="text-muted">El resultado del escaneo se mostrará aquí</p>
+          `;
+          successResult.classList.add('d-none');
+          errorResult.classList.add('d-none');
+          scanResult.classList.remove('d-none');
         }
       });
     }
     
-    // Procesar el cu00f3digo QR escaneado
+    // Procesar el código QR escaneado
     function processQRCode(qrData) {
       // Crear un overlay temporal para mostrar el procesamiento
       const processingOverlay = document.createElement('div');
@@ -231,124 +296,94 @@
       processingOverlay.style.zIndex = '1000';
       processingOverlay.innerHTML = `
         <div class="text-center">
-          <div class="spinner-border text-primary mb-3" role="status">
-            <span class="sr-only">Cargando...</span>
+          <div class="spinner-border text-primary mb-2" role="status">
+            <span class="sr-only">Procesando...</span>
           </div>
-          <h5>Procesando...</h5>
-          <p class="text-muted">Verificando cu00f3digo QR</p>
+          <p class="mb-0">Procesando código QR...</p>
         </div>
       `;
       
-      // Pausar temporalmente el escaneo mientras procesamos
-      if (isScanning) {
-        html5QrCode.pause();
-      }
-      
+      // Añadir overlay al contenedor del escáner
       document.getElementById('reader').appendChild(processingOverlay);
       
-      // Enviar datos al servidor
+      // Enviar datos al servidor para procesar
       fetch('/recursos-humanos/attendance/process-scan', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ qrData })
       })
       .then(response => response.json())
       .then(data => {
-        // Eliminar el overlay de procesamiento
-        document.getElementById('reader').removeChild(processingOverlay);
+        // Eliminar overlay de procesamiento
+        processingOverlay.remove();
         
         if (data.success) {
-          // Detener el escaneo completamente
-          if (isScanning) {
+          // Mostrar resultado exitoso
+          showSuccessResult(data);
+          
+          // Actualizar lista de registros recientes
+          updateRecentRecords(data.recentRecords);
+          
+          // Si es una salida, detener el escáner automáticamente
+          if (data.action === 'salida' && isScanning) {
             html5QrCode.stop().then(() => {
               isScanning = false;
               startButton.disabled = false;
               stopButton.disabled = true;
-              
-              // Mostrar notificaciu00f3n de u00e9xito
-              showSuccessConfirmation(data);
-              addToRecentScans(data);
-            }).catch(error => {
-              console.error('Error al detener el escaneo:', error);
+            }).catch(err => {
+              console.error('Error al detener el escáner después de salida:', err);
             });
           }
         } else {
-          // En caso de error, detener el escaneo tambiu00e9n
-          if (isScanning) {
-            html5QrCode.stop().then(() => {
-              isScanning = false;
-              startButton.disabled = false;
-              stopButton.disabled = true;
-              
-              showErrorConfirmation(data.message);
-            }).catch(error => {
-              console.error('Error al detener el escaneo:', error);
-            });
-          }
+          // Mostrar mensaje de error
+          showErrorResult(data.message);
         }
       })
       .catch(error => {
-        // Eliminar el overlay de procesamiento
-        document.getElementById('reader').removeChild(processingOverlay);
-        
-        console.error('Error al procesar el cu00f3digo QR:', error);
-        showErrorNotification('Error de conexiu00f3n. Intente nuevamente.');
-        
-        // Reanudar el escaneo despuu00e9s de 2 segundos
-        setTimeout(() => {
-          if (isScanning) {
-            html5QrCode.resume();
-          }
-        }, 2000);
+        // Eliminar overlay de procesamiento
+        processingOverlay.remove();
+        console.error('Error al procesar el código QR:', error);
+        showErrorResult('Error de conexión. Intente nuevamente.');
       });
     }
     
-    // Mostrar confirmación de éxito permanente
-    function showSuccessConfirmation(data) {
-      const isEntry = data.action === 'entrada';
-      const timeStr = isEntry 
-        ? new Date(data.record.entryTime).toLocaleTimeString() 
-        : new Date(data.record.exitTime).toLocaleTimeString();
-      
+    // Mostrar resultado exitoso
+    function showSuccessResult(data) {
       // Actualizar el panel de resultado
-      successResult.classList.remove('d-none');
-      errorResult.classList.add('d-none');
       scanResult.classList.add('d-none');
+      errorResult.classList.add('d-none');
+      successResult.classList.remove('d-none');
       
-      // Actualizar datos
-      actionType.textContent = isEntry ? 'Entrada Registrada' : 'Salida Registrada';
-      actionType.className = isEntry ? 'text-success' : 'text-info';
+      // Actualizar tipo de acción (entrada/salida)
+      actionType.textContent = data.action === 'entrada' ? 'Entrada Registrada' : 'Salida Registrada';
+      actionType.className = data.action === 'entrada' ? 'text-success' : 'text-info';
       
+      // Actualizar datos del empleado
       employeeCedula.textContent = data.employee.cedula;
       employeeName.textContent = `${data.employee.nombres} ${data.employee.apellidos}`;
-      recordTime.textContent = timeStr;
+      recordTime.textContent = new Date(data.timestamp).toLocaleTimeString();
       
       // Mostrar horas trabajadas solo para salidas
-      if (!isEntry) {
+      if (data.action === 'salida' && data.hoursWorked) {
+        hoursWorked.textContent = `${data.hoursWorked} horas`;
         hoursWorkedRow.classList.remove('d-none');
-        hoursWorked.textContent = `${data.record.hoursWorked} horas`;
       } else {
         hoursWorkedRow.classList.add('d-none');
       }
       
-      // Actualizar el mensaje del panel de escaneo para indicar que está detenido
-      scanResult.innerHTML = `
-        <div class="mb-3">
-          <i class="fas fa-check-circle fa-4x text-success"></i>
-        </div>
-        <h5 class="text-success">${isEntry ? 'Entrada' : 'Salida'} Registrada Correctamente</h5>
-        <p class="text-muted">La cámara ha sido detenida. Presione 'Iniciar Escaneo' para realizar un nuevo registro.</p>
-        <div class="alert alert-success mt-3">
-          <i class="fas fa-info-circle mr-2"></i>
-          <strong>Registro completado:</strong> ${data.message}
-        </div>
-      `;
+      // Mostrar notificación toast
+      if (typeof toastr !== 'undefined') {
+        toastr.success(
+          `${data.action === 'entrada' ? 'Entrada' : 'Salida'} registrada correctamente para ${data.employee.nombres} ${data.employee.apellidos}`,
+          'Registro Exitoso'
+        );
+      }
     }
     
-    // Mostrar confirmación de error permanente
-    function showErrorConfirmation(message) {
+    // Mostrar resultado de error
+    function showErrorResult(message) {
       // Actualizar el panel de resultado
       errorResult.classList.remove('d-none');
       successResult.classList.add('d-none');
@@ -357,46 +392,15 @@
       // Actualizar mensaje de error
       errorMessage.textContent = message;
       
-      // Actualizar el mensaje del panel de escaneo para indicar que está detenido
-      scanResult.innerHTML = `
-        <div class="mb-3">
-          <i class="fas fa-exclamation-circle fa-4x text-danger"></i>
-        </div>
-        <h5 class="text-danger">Error en el Registro</h5>
-        <p class="text-muted">La cámara ha sido detenida. Presione 'Iniciar Escaneo' para intentar nuevamente.</p>
-        <div class="alert alert-danger mt-3">
-          <i class="fas fa-exclamation-triangle mr-2"></i>
-          <strong>Error:</strong> ${message}
-        </div>
-      `;
-    }
-    
-    // Mantener estas funciones por compatibilidad
-    function showNotification(data) {
-      showSuccessConfirmation(data);
-    }
-    
-    function showErrorNotification(message) {
-      showErrorConfirmation(message);
-    }
-    
-    // Agregar a registros recientes
-    function addToRecentScans(data) {
-      // Agregar al inicio del array
-      recentScans.unshift(data);
-      
-      // Limitar a 5 registros
-      if (recentScans.length > 5) {
-        recentScans.pop();
+      // Mostrar notificación toast
+      if (typeof toastr !== 'undefined') {
+        toastr.error(message, 'Error de Registro');
       }
-      
-      // Actualizar UI
-      updateRecentScansUI();
     }
     
-    // Actualizar UI de registros recientes
-    function updateRecentScansUI() {
-      if (recentScans.length === 0) {
+    // Actualizar lista de registros recientes
+    function updateRecentRecords(records) {
+      if (!records || records.length === 0) {
         recentRecords.innerHTML = `
           <div class="text-center py-4">
             <p class="text-muted">No hay registros recientes</p>
@@ -405,64 +409,35 @@
         return;
       }
       
-      let html = '<ul class="list-group list-group-flush">';
+      let html = `<ul class="list-group list-group-flush">`;
       
-      recentScans.forEach(scan => {
-        const isEntry = scan.action === 'entrada';
-        const timeStr = isEntry 
-          ? new Date(scan.record.entryTime).toLocaleTimeString() 
-          : new Date(scan.record.exitTime).toLocaleTimeString();
+      records.forEach(record => {
+        const date = new Date(record.timestamp);
+        const timeStr = date.toLocaleTimeString();
+        const dateStr = date.toLocaleDateString();
+        
+        const actionClass = record.action === 'entrada' ? 'success' : 'info';
+        const actionIcon = record.action === 'entrada' ? 'sign-in-alt' : 'sign-out-alt';
         
         html += `
-          <li class="list-group-item">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <span class="badge badge-${isEntry ? 'success' : 'info'} mr-2">${isEntry ? 'Entrada' : 'Salida'}</span>
-                <small>${scan.employee.nombres} ${scan.employee.apellidos}</small>
-              </div>
-              <small class="text-muted">${timeStr}</small>
+          <li class="list-group-item d-flex justify-content-between align-items-center p-3">
+            <div>
+              <div class="font-weight-bold">${record.employee.nombres} ${record.employee.apellidos}</div>
+              <small class="text-muted">${dateStr} ${timeStr}</small>
             </div>
+            <span class="badge badge-${actionClass} badge-pill px-3 py-2">
+              <i class="fas fa-${actionIcon} mr-1"></i>
+              ${record.action === 'entrada' ? 'Entrada' : 'Salida'}
+            </span>
           </li>
         `;
       });
       
-      html += '</ul>';
+      html += `</ul>`;
       recentRecords.innerHTML = html;
     }
     
-    // Resetear la UI
-    function resetUI() {
-      // Detener el escaneo si estu00e1 activo
-      if (isScanning) {
-        html5QrCode.stop().then(() => {
-          isScanning = false;
-          startButton.disabled = false;
-          stopButton.disabled = true;
-        }).catch(error => {
-          console.error('Error al detener el escaneo:', error);
-        });
-      }
-      
-      // Resetear los paneles de resultado
-      scanResult.classList.remove('d-none');
-      successResult.classList.add('d-none');
-      errorResult.classList.add('d-none');
-      
-      // Resetear el contenido del panel de escaneo
-      scanResult.innerHTML = `
-        <div class="mb-3">
-          <i class="fas fa-qrcode fa-4x text-muted"></i>
-        </div>
-        <h5 class="text-muted">Esperando escaneo...</h5>
-        <p class="text-muted">Presione 'Iniciar Escaneo' para comenzar</p>
-      `;
-      
-      // Limpiar los registros recientes
-      recentScans.length = 0;
-      updateRecentScansUI();
-    }
-    
-    // Inicializar la aplicaciu00f3n
+    // Inicializar el escaner QR al cargar la página
     initQRScanner();
   });
 </script>

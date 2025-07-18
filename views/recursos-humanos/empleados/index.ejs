@@ -6,9 +6,14 @@
           <h1 class="h3 mb-2 text-gray-800">Gestión de Empleados</h1>
           <p class="mb-0 text-muted">Listado de empleados registrados en el sistema</p>
         </div>
-        <a href="/recursos-humanos/empleados/create" class="btn btn-primary">
-          <i class="fas fa-user-plus mr-1"></i> Nuevo Empleado
-        </a>
+        <div class="btn-group">
+          <a href="/recursos-humanos/empleados/create-profesor" class="btn btn-primary">
+            <i class="fas fa-chalkboard-teacher mr-1"></i> Nuevo Profesor
+          </a>
+          <a href="/recursos-humanos/empleados/create-personal" class="btn btn-warning">
+            <i class="fas fa-user-tie mr-1"></i> Nuevo Personal
+          </a>
+        </div>
       </div>
     </div>
   </div>
@@ -24,9 +29,13 @@
         </a>
         <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
           <div class="dropdown-header">Opciones:</div>
-          <a class="dropdown-item" href="/recursos-humanos/empleados/create">
-            <i class="fas fa-user-plus fa-sm fa-fw mr-2 text-gray-400"></i>
-            Nuevo Empleado
+          <a class="dropdown-item" href="/recursos-humanos/empleados/create-profesor">
+            <i class="fas fa-chalkboard-teacher fa-sm fa-fw mr-2 text-gray-400"></i>
+            Nuevo Profesor
+          </a>
+          <a class="dropdown-item" href="/recursos-humanos/empleados/create-personal">
+            <i class="fas fa-user-tie fa-sm fa-fw mr-2 text-gray-400"></i>
+            Nuevo Personal
           </a>
           <a class="dropdown-item" href="/recursos-humanos">
             <i class="fas fa-arrow-left fa-sm fa-fw mr-2 text-gray-400"></i>
@@ -81,10 +90,15 @@
             </div>
             <div>
               <h5 class="alert-heading text-info">No hay empleados registrados</h5>
-              <p class="mb-0">No se encontraron empleados en el sistema. Puedes registrar un nuevo empleado haciendo clic en el botón a continuación.</p>
-              <a href="/recursos-humanos/empleados/create" class="btn btn-info mt-3">
-                <i class="fas fa-user-plus mr-1"></i> Registrar Nuevo Empleado
-              </a>
+              <p class="mb-0">No se encontraron empleados en el sistema. Puedes registrar un nuevo profesor o personal haciendo clic en los botones a continuación.</p>
+              <div class="mt-3">
+                <a href="/recursos-humanos/empleados/create-profesor" class="btn btn-primary mr-2">
+                  <i class="fas fa-chalkboard-teacher mr-1"></i> Registrar Nuevo Profesor
+                </a>
+                <a href="/recursos-humanos/empleados/create-personal" class="btn btn-warning">
+                  <i class="fas fa-user-tie mr-1"></i> Registrar Nuevo Personal
+                </a>
+              </div>
             </div>
           </div>
         </div>

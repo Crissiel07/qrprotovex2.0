@@ -8,6 +8,11 @@ const StudentSchema = new mongoose.Schema({
   apellidos: String,
   email: String,
   carrera: String,
+  // Foto del estudiante
+  foto: {
+    type: String,
+    default: ''
+  },
   tipoEstudiante: {
     type: String,
     enum: ['Particulado', 'Becado'],

@@ -1,13 +1,14 @@
 const nodemailer = require('nodemailer');
+require('dotenv').config();
 
 // Configuración del transporte de correo con los datos SMTP proporcionados
 const transporter = nodemailer.createTransport({
-  host: 'mail.maxempleos.com',
-  port: 465,
-  secure: true, // true para puerto 465, false para otros puertos
+  host: process.env.SMTP_HOST,
+  port: parseInt(process.env.SMTP_PORT),
+  secure: process.env.SMTP_SECURE === 'true', // true para puerto 465, false para otros puertos
   auth: {
-    user: 'web@maxempleos.com',
-    pass: 'Mx.89c4f0'
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
   }
 });
 
@@ -37,7 +38,7 @@ const sendQREmail = async (to, studentName, qrCodeImage) => {
     }
     
     const mailOptions = {
-      from: 'web@maxempleos.com',
+      from: process.env.EMAIL_FROM,
       to: to,
       subject: 'Tu código QR de acceso - Universidad',
       html: `

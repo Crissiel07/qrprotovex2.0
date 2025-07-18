@@ -5,6 +5,8 @@ const Employee = require('../models/Employee');
 const qrcode = require('qrcode');
 const fs = require('fs');
 const path = require('path');
+const { generateQRCode } = require('../utils/qrGenerator');
+const { sendQREmail } = require('../config/mail');
 
 // Ruta para listar empleados
 router.get('/', isAuthenticated, isRecursosHumanos, async (req, res) => {
@@ -20,16 +22,146 @@ router.get('/', isAuthenticated, isRecursosHumanos, async (req, res) => {
   }
 });
 
-// Ruta para mostrar formulario de creaciu00f3n
+// Ruta para mostrar formulario de creación de profesor
+router.get('/create-profesor', isAuthenticated, isRecursosHumanos, (req, res) => {
+  res.render('recursos-humanos/empleados/create-profesor', {
+    user: req.session.user
+  });
+});
+
+// Ruta para procesar el formulario de creación de profesor
+router.post('/create-profesor', isAuthenticated, isRecursosHumanos, async (req, res) => {
+  try {
+    const { cedula, email, nombres, apellidos, especialidad, departamento, tipoEmpleado } = req.body;
+    
+    // Validar datos
+    if (!cedula || !email || !nombres || !apellidos || !especialidad || !departamento) {
+      req.flash('error_msg', 'Todos los campos son obligatorios');
+      return res.redirect('/recursos-humanos/empleados/create-profesor');
+    }
+
+    // Verificar si ya existe un empleado con la misma cédula
+    const empleadoExistente = await Employee.findOne({ cedula });
+    if (empleadoExistente) {
+      req.flash('error_msg', 'Ya existe un empleado registrado con esta cédula');
+      return res.redirect('/recursos-humanos/empleados/create-profesor');
+    }
+
+    // Crear nuevo profesor
+    const nuevoProfesor = new Employee({
+      cedula,
+      email,
+      nombres,
+      apellidos,
+      especialidad,
+      departamento,
+      tipoEmpleado: 'Profesor'
+    });
+
+    // Generar código QR único
+    const qrCode = await generateQRCode(nuevoProfesor._id.toString());
+    nuevoProfesor.qrCode = qrCode;
+
+    // Guardar profesor en la base de datos
+    await nuevoProfesor.save();
+
+    // Enviar correo con código QR
+    try {
+      const nombreCompleto = `${nombres} ${apellidos}`;
+      const enviado = await sendQREmail(email, nombreCompleto, qrCode);
+      if (enviado) {
+        console.log(`Código QR enviado exitosamente a ${email}`);
+      } else {
+        console.error(`Error al enviar código QR a ${email}`);
+      }
+    } catch (emailError) {
+      console.error('Error al enviar el correo:', emailError);
+    }
+
+    req.flash('success_msg', 'Profesor registrado exitosamente');
+    res.redirect('/recursos-humanos/empleados');
+  } catch (error) {
+    console.error('Error al crear profesor:', error);
+    req.flash('error_msg', 'Error al registrar el profesor');
+    res.redirect('/recursos-humanos/empleados/create-profesor');
+  }
+});
+
+// Ruta para mostrar formulario de creación de personal
+router.get('/create-personal', isAuthenticated, isRecursosHumanos, (req, res) => {
+  res.render('recursos-humanos/empleados/create-personal', {
+    user: req.session.user
+  });
+});
+
+// Ruta para procesar el formulario de creación de personal
+router.post('/create-personal', isAuthenticated, isRecursosHumanos, async (req, res) => {
+  try {
+    const { cedula, email, nombres, apellidos, cargo, departamento, tipoEmpleado } = req.body;
+    
+    // Validar datos
+    if (!cedula || !email || !nombres || !apellidos || !cargo || !departamento) {
+      req.flash('error_msg', 'Todos los campos son obligatorios');
+      return res.redirect('/recursos-humanos/empleados/create-personal');
+    }
+
+    // Verificar si ya existe un empleado con la misma cédula
+    const empleadoExistente = await Employee.findOne({ cedula });
+    if (empleadoExistente) {
+      req.flash('error_msg', 'Ya existe un empleado registrado con esta cédula');
+      return res.redirect('/recursos-humanos/empleados/create-personal');
+    }
+
+    // Crear nuevo empleado
+    const nuevoEmpleado = new Employee({
+      cedula,
+      email,
+      nombres,
+      apellidos,
+      cargo,
+      departamento,
+      tipoEmpleado
+    });
+
+    // Generar código QR único
+    const qrCode = await generateQRCode(nuevoEmpleado._id.toString());
+    nuevoEmpleado.qrCode = qrCode;
+
+    // Guardar empleado en la base de datos
+    await nuevoEmpleado.save();
+
+    // Enviar correo con código QR
+    try {
+      const nombreCompleto = `${nombres} ${apellidos}`;
+      const enviado = await sendQREmail(email, nombreCompleto, qrCode);
+      if (enviado) {
+        console.log(`Código QR enviado exitosamente a ${email}`);
+      } else {
+        console.error(`Error al enviar código QR a ${email}`);
+      }
+    } catch (emailError) {
+      console.error('Error al enviar el correo:', emailError);
+    }
+
+    req.flash('success_msg', 'Personal registrado exitosamente');
+    res.redirect('/recursos-humanos/empleados');
+  } catch (error) {
+    console.error('Error al crear personal:', error);
+    req.flash('error_msg', 'Error al registrar el personal');
+    res.redirect('/recursos-humanos/empleados/create-personal');
+  }
+});
+
+// Ruta para mostrar formulario general (mantener por compatibilidad)
 router.get('/create', isAuthenticated, isRecursosHumanos, (req, res) => {
   res.render('recursos-humanos/empleados/create', {
     user: req.session.user
   });
 });
 
-// Ruta para procesar la creaciu00f3n de empleado
+// Ruta para procesar la creación de empleado
 router.post('/create', isAuthenticated, isRecursosHumanos, async (req, res) => {
-  const { cedula, nombres, apellidos, email } = req.body;
+  const { cedula, nombres, apellidos, email, tipoEmpleado, cargo } = req.body;
   let errors = [];
 
   // Validaciu00f3n bu00e1sica
@@ -73,8 +205,9 @@ router.post('/create', isAuthenticated, isRecursosHumanos, async (req, res) => {
       nombres,
       apellidos,
       email,
-      cargo: 'Profesor',
-      departamento: 'Acadu00e9mico'
+      tipoEmpleado: tipoEmpleado || 'Profesor',
+      cargo: cargo || (tipoEmpleado === 'Personal' ? 'Administrativo' : 'Profesor'),
+      departamento: tipoEmpleado === 'Personal' ? 'Administrativo' : 'Académico'
     });
 
     // Generar cu00f3digo QR

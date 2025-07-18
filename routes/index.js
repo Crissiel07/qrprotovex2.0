@@ -364,6 +364,7 @@ router.get('/verificar-qr', async (req, res) => {
       apellidos: student.apellidos,
       cedula: student.cedula,
       carrera: student.carrera,
+      foto: student.foto || '', // Incluir la foto si existe
       tipoEstudiante: student.tipoEstudiante,
       tipoBeca: student.tipoBeca,
       inscripcion: student.inscripcion,

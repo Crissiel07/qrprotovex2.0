@@ -1,11 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const mongoose = require('mongoose');
+const path = require('path');
+const fs = require('fs');
 const { isAuthenticated, isControlEstudio } = require('../middleware/auth');
 const Student = require('../models/Student');
 const FormData = require('../models/FormData');
 const { generateStudentQR } = require('../utils/qrGenerator');
 const { sendQREmail } = require('../config/mail');
+const { uploadStudentPhoto } = require('../utils/uploadConfig');
 
 // Ruta para mostrar la página de gestión de estudiantes
 router.get('/', isAuthenticated, isControlEstudio, async (req, res) => {
@@ -23,7 +26,7 @@ router.get('/', isAuthenticated, isControlEstudio, async (req, res) => {
 });
 
 // Ruta para crear un nuevo estudiante
-router.post('/create', isAuthenticated, isControlEstudio, async (req, res) => {
+router.post('/create', isAuthenticated, isControlEstudio, uploadStudentPhoto.single('foto'), async (req, res) => {
   try {
     // Log para depuración - ver todo el body del request
     console.log('BODY COMPLETO:', req.body);
@@ -72,6 +75,35 @@ router.post('/create', isAuthenticated, isControlEstudio, async (req, res) => {
       tipoBeca: tipoEstudiante === 'Becado' ? tipoBeca : 'No Aplica',
       fechaRegistro: new Date()
     };
+    
+    // Procesar la foto del estudiante
+    // Caso 1: Foto subida desde el dispositivo
+    if (req.file) {
+      // La ruta relativa para acceder desde el navegador
+      studentData.foto = `/uploads/estudiantes/${req.file.filename}`;
+      console.log('Foto subida desde dispositivo:', studentData.foto);
+    } 
+    // Caso 2: Foto tomada con la cámara web
+    else if (req.body['camera-data'] && req.body['camera-data'].startsWith('data:image')) {
+      try {
+        // Extraer los datos de la imagen base64
+        const base64Data = req.body['camera-data'].replace(/^data:image\/\w+;base64,/, '');
+        const buffer = Buffer.from(base64Data, 'base64');
+        
+        // Generar un nombre único para el archivo
+        const fileName = `${Date.now()}-${Math.round(Math.random() * 1E9)}.jpg`;
+        const filePath = path.join(__dirname, '../public/uploads/estudiantes', fileName);
+        
+        // Guardar el archivo
+        fs.writeFileSync(filePath, buffer);
+        
+        // Guardar la ruta en el objeto del estudiante
+        studentData.foto = `/uploads/estudiantes/${fileName}`;
+        console.log('Foto capturada con cámara:', studentData.foto);
+      } catch (error) {
+        console.error('Error al procesar la imagen de la cámara:', error);
+      }
+    }
     
     // Añadir estados de pago para estudiantes particulados
     if (tipoEstudiante === 'Particulado') {

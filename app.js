@@ -5,6 +5,7 @@ const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoDBStore = require('connect-mongodb-session')(session);
 const flash = require('connect-flash');
+require('dotenv').config();
 const connectDB = require('./config/db');
 
 // Inicializar la aplicación
@@ -15,7 +16,7 @@ connectDB();
 
 // Configurar el store para las sesiones
 const store = new MongoDBStore({
-  uri: 'mongodb+srv://ProtoVex:7VF1z9F0w6FaxXEp@cluster0.glsihl9.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0',
+  uri: process.env.MONGODB_URI,
   collection: 'sessions'
 });
 
@@ -33,7 +34,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Configurar sesiones
 app.use(session({
-  secret: 'secret',
+  secret: process.env.SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
   store: store,

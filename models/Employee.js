@@ -28,6 +28,11 @@ const EmployeeSchema = new mongoose.Schema({
     type: String,
     default: 'Académico'
   },
+  tipoEmpleado: {
+    type: String,
+    enum: ['Profesor', 'Personal'],
+    default: 'Profesor'
+  },
   
   // Estado del empleado
   estado: {
