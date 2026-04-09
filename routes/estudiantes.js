@@ -77,7 +77,6 @@ router.post('/create', isAuthenticated, isControlEstudio, uploadStudentPhoto.sin
     };
     
     // Procesar la foto del estudiante
-<<<<<<< HEAD
     // Caso 1: Foto subida desde el dispositivo (guardada en memoria como buffer)
     if (req.file) {
       // Convertir el buffer a base64 y guardar directamente en MongoDB
@@ -90,34 +89,7 @@ router.post('/create', isAuthenticated, isControlEstudio, uploadStudentPhoto.sin
     else if (req.body['camera-data'] && req.body['camera-data'].startsWith('data:image')) {
       studentData.foto = req.body['camera-data'];
       console.log('Foto capturada con cámara guardada como base64');
-=======
-    // Caso 1: Foto subida desde el dispositivo
-    if (req.file) {
-      // La ruta relativa para acceder desde el navegador
-      studentData.foto = `/uploads/estudiantes/${req.file.filename}`;
-      console.log('Foto subida desde dispositivo:', studentData.foto);
-    } 
-    // Caso 2: Foto tomada con la cámara web
-    else if (req.body['camera-data'] && req.body['camera-data'].startsWith('data:image')) {
-      try {
-        // Extraer los datos de la imagen base64
-        const base64Data = req.body['camera-data'].replace(/^data:image\/\w+;base64,/, '');
-        const buffer = Buffer.from(base64Data, 'base64');
-        
-        // Generar un nombre único para el archivo
-        const fileName = `${Date.now()}-${Math.round(Math.random() * 1E9)}.jpg`;
-        const filePath = path.join(__dirname, '../public/uploads/estudiantes', fileName);
-        
-        // Guardar el archivo
-        fs.writeFileSync(filePath, buffer);
-        
-        // Guardar la ruta en el objeto del estudiante
-        studentData.foto = `/uploads/estudiantes/${fileName}`;
-        console.log('Foto capturada con cámara:', studentData.foto);
-      } catch (error) {
-        console.error('Error al procesar la imagen de la cámara:', error);
-      }
->>>>>>> 2a1ae6edcb98c01606fabda841d9aaf98efad93b
+
     }
     
     // Añadir estados de pago para estudiantes particulados
