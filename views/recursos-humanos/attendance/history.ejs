@@ -1,0 +1,277 @@
+<div class="container-fluid px-0">
+  <div class="row">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="h3 mb-2 text-gray-800">Historial de Asistencia</h1>
+          <p class="mb-0 text-muted">Consulta y filtrado de registros de asistencia de empleados</p>
+        </div>
+        <a href="/recursos-humanos/attendance/scan" class="btn btn-primary">
+          <i class="fas fa-qrcode mr-1"></i> Escanear QR
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="card shadow mb-4 border-left-info">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+      <h6 class="m-0 font-weight-bold text-info">
+        <i class="fas fa-filter mr-1"></i> Filtros de Bu00fasqueda
+      </h6>
+    </div>
+    <div class="card-body">
+      <form action="/recursos-humanos/attendance/history" method="GET" class="mb-0">
+        <div class="row">
+          <div class="col-md-4">
+            <div class="form-group">
+              <label for="employee" class="font-weight-bold">Empleado</label>
+              <select class="form-control" id="employee" name="employee">
+                <option value="">Seleccione un empleado</option>
+                <% if(typeof employees !== 'undefined' && employees.length > 0) { %>
+                  <% employees.forEach(employee => { %>
+                    <option value="<%= employee._id %>" <%= (filters && filters.employeeId === employee._id.toString()) ? 'selected' : '' %>>
+                      <%= employee.apellidos %>, <%= employee.nombres %> (<%= employee.cedula %>)
+                    </option>
+                  <% }); %>
+                <% } %>
+              </select>
+            </div>
+          </div>
+          
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="period" class="font-weight-bold">Periodo</label>
+              <select class="form-control" id="period" name="period">
+                <option value="week" <%= (filters && filters.period === 'week') ? 'selected' : '' %>>Semana</option>
+                <option value="month" <%= (filters && filters.period === 'month') ? 'selected' : '' %>>Mes</option>
+                <option value="year" <%= (filters && filters.period === 'year') ? 'selected' : '' %>>Au00f1o</option>
+              </select>
+            </div>
+          </div>
+          
+          <div class="col-md-3">
+            <div class="form-group">
+              <label for="value" class="font-weight-bold">Valor</label>
+              <input type="number" class="form-control" id="value" name="value" value="<%= filters ? filters.value : '' %>">
+              <small class="form-text text-muted">Nu00famero de semana, mes o au00f1o</small>
+            </div>
+          </div>
+          
+          <div class="col-md-2 d-flex align-items-end">
+            <button type="submit" class="btn btn-info btn-block">
+              <i class="fas fa-search mr-1"></i> Buscar
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  
+  <% if(typeof selectedEmployee !== 'undefined' && selectedEmployee) { %>
+    <div class="row">
+      <div class="col-lg-4">
+        <div class="card shadow mb-4 border-left-primary">
+          <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">
+              <i class="fas fa-user mr-1"></i> Datos del Empleado
+            </h6>
+          </div>
+          <div class="card-body">
+            <div class="text-center mb-3">
+              <% if(selectedEmployee.qrCode) { %>
+                <img src="<%= selectedEmployee.qrCode %>" alt="Cu00f3digo QR" class="img-fluid border" style="max-width: 150px;">
+              <% } else { %>
+                <div class="alert alert-warning">
+                  <i class="fas fa-exclamation-triangle"></i> No hay cu00f3digo QR disponible
+                </div>
+              <% } %>
+            </div>
+            
+            <div class="row mb-2">
+              <div class="col-5 font-weight-bold text-muted">Nombre:</div>
+              <div class="col-7"><%= selectedEmployee.nombres %> <%= selectedEmployee.apellidos %></div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-5 font-weight-bold text-muted">Cu00e9dula:</div>
+              <div class="col-7"><%= selectedEmployee.cedula %></div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-5 font-weight-bold text-muted">Cargo:</div>
+              <div class="col-7"><%= selectedEmployee.cargo %></div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-5 font-weight-bold text-muted">Departamento:</div>
+              <div class="col-7"><%= selectedEmployee.departamento %></div>
+            </div>
+            <div class="row mb-2">
+              <div class="col-5 font-weight-bold text-muted">Estado:</div>
+              <div class="col-7">
+                <% if(selectedEmployee.estado === 'Activo') { %>
+                  <span class="badge badge-success">Activo</span>
+                <% } else if(selectedEmployee.estado === 'Inactivo') { %>
+                  <span class="badge badge-secondary">Inactivo</span>
+                <% } else if(selectedEmployee.estado === 'Suspendido') { %>
+                  <span class="badge badge-warning">Suspendido</span>
+                <% } else if(selectedEmployee.estado === 'Retirado') { %>
+                  <span class="badge badge-danger">Retirado</span>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <% if(typeof stats !== 'undefined' && stats) { %>
+          <div class="card shadow mb-4 border-left-success">
+            <div class="card-header py-3">
+              <h6 class="m-0 font-weight-bold text-success">
+                <i class="fas fa-chart-pie mr-1"></i> Estadu00edsticas: <%= periodName %>
+              </h6>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-6 mb-3">
+                  <div class="card bg-primary text-white">
+                    <div class="card-body text-center py-3">
+                      <h3><%= stats.totalHours %></h3>
+                      <p class="mb-0">Horas Trabajadas</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6 mb-3">
+                  <div class="card bg-success text-white">
+                    <div class="card-body text-center py-3">
+                      <h3><%= stats.completedDays %></h3>
+                      <p class="mb-0">Du00edas Completos</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6 mb-3">
+                  <div class="card bg-warning text-white">
+                    <div class="card-body text-center py-3">
+                      <h3><%= stats.incompleteDays %></h3>
+                      <p class="mb-0">Du00edas Incompletos</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="col-6 mb-3">
+                  <div class="card bg-info text-white">
+                    <div class="card-body text-center py-3">
+                      <h3><%= stats.totalDays %></h3>
+                      <p class="mb-0">Total Du00edas</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% } %>
+      </div>
+      
+      <div class="col-lg-8">
+        <div class="card shadow mb-4 border-left-warning">
+          <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+            <h6 class="m-0 font-weight-bold text-warning">
+              <i class="fas fa-list mr-1"></i> Registros de Asistencia: <%= periodName %>
+            </h6>
+            <div class="dropdown no-arrow">
+              <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+              </a>
+              <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in" aria-labelledby="dropdownMenuLink">
+                <div class="dropdown-header">Opciones:</div>
+                <a class="dropdown-item" href="#">
+                  <i class="fas fa-file-excel fa-sm fa-fw mr-2 text-gray-400"></i>
+                  Exportar a Excel
+                </a>
+                <a class="dropdown-item" href="#">
+                  <i class="fas fa-print fa-sm fa-fw mr-2 text-gray-400"></i>
+                  Imprimir
+                </a>
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <% if(typeof records !== 'undefined' && records.length > 0) { %>
+              <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="0">
+                  <thead class="bg-light">
+                    <tr>
+                      <th>Fecha</th>
+                      <th>Entrada</th>
+                      <th>Salida</th>
+                      <th>Horas</th>
+                      <th>Estado</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% records.forEach(record => { %>
+                      <tr>
+                        <td><%= new Date(record.entryTime).toLocaleDateString() %></td>
+                        <td><%= new Date(record.entryTime).toLocaleTimeString() %></td>
+                        <td>
+                          <% if(record.exitTime) { %>
+                            <%= new Date(record.exitTime).toLocaleTimeString() %>
+                          <% } else { %>
+                            <span class="text-muted">Pendiente</span>
+                          <% } %>
+                        </td>
+                        <td>
+                          <% if(record.status === 'salida') { %>
+                            <%= record.hoursWorked %>
+                          <% } else { %>
+                            <span class="text-muted">-</span>
+                          <% } %>
+                        </td>
+                        <td>
+                          <% if(record.status === 'entrada') { %>
+                            <span class="badge badge-warning">Incompleto</span>
+                          <% } else if(record.status === 'salida') { %>
+                            <span class="badge badge-success">Completo</span>
+                          <% } else { %>
+                            <span class="badge badge-secondary"><%= record.status %></span>
+                          <% } %>
+                        </td>
+                      </tr>
+                    <% }); %>
+                  </tbody>
+                </table>
+              </div>
+            <% } else { %>
+              <div class="alert alert-info bg-light-info border-0">
+                <div class="d-flex">
+                  <div class="mr-3">
+                    <i class="fas fa-info-circle fa-2x text-info"></i>
+                  </div>
+                  <div>
+                    <h5 class="alert-heading text-info">No hay registros</h5>
+                    <p class="mb-0">No se encontraron registros de asistencia para el empleado en el periodo seleccionado.</p>
+                  </div>
+                </div>
+              </div>
+            <% } %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% } else { %>
+    <div class="alert alert-info bg-light-info border-0">
+      <div class="d-flex">
+        <div class="mr-3">
+          <i class="fas fa-info-circle fa-2x text-info"></i>
+        </div>
+        <div>
+          <h5 class="alert-heading text-info">Seleccione un empleado</h5>
+          <p class="mb-0">Por favor, seleccione un empleado para ver su historial de asistencia.</p>
+        </div>
+      </div>
+    </div>
+  <% } %>
+  
+  <div class="row">
+    <div class="col-12">
+      <a href="/recursos-humanos" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left mr-1"></i> Volver al Panel de Recursos Humanos
+      </a>
+    </div>
+  </div>
+</div>

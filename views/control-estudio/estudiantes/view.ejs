@@ -1,0 +1,203 @@
+<%- include('../../partials/header') %>
+<%- include('../../partials/navbar') %>
+<%- include('../../partials/sidebar') %>
+
+<div class="content-wrapper">
+  <div class="content-header">
+    <div class="container-fluid">
+      <div class="row mb-2">
+        <div class="col-sm-6">
+          <h1 class="m-0">Detalles del Estudiante</h1>
+        </div>
+        <div class="col-sm-6">
+          <ol class="breadcrumb float-sm-right">
+            <li class="breadcrumb-item"><a href="/control-estudio">Control de Estudio</a></li>
+            <li class="breadcrumb-item"><a href="/control-estudio/estudiantes">Estudiantes</a></li>
+            <li class="breadcrumb-item active">Detalles</li>
+          </ol>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <section class="content">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-12">
+          <div class="card">
+            <div class="card-header bg-info">
+              <h3 class="card-title text-white">
+                <i class="fas fa-user-graduate mr-2"></i>
+                <%= student.nombres %> <%= student.apellidos %>
+              </h3>
+            </div>
+            <div class="card-body">
+              <div class="row">
+                <div class="col-md-6">
+                  <div class="card">
+                    <div class="card-header bg-primary">
+                      <h5 class="card-title text-white mb-0">
+                        <i class="fas fa-id-card mr-2"></i>
+                        Información Personal
+                      </h5>
+                    </div>
+                    <div class="card-body">
+                      <table class="table table-bordered">
+                        <tr>
+                          <th style="width: 40%">Cédula</th>
+                          <td><%= student.cedula %></td>
+                        </tr>
+                        <tr>
+                          <th>Nombres</th>
+                          <td><%= student.nombres %></td>
+                        </tr>
+                        <tr>
+                          <th>Apellidos</th>
+                          <td><%= student.apellidos %></td>
+                        </tr>
+                        <tr>
+                          <th>Correo Electrónico</th>
+                          <td><%= student.email %></td>
+                        </tr>
+                        <tr>
+                          <th>Fecha de Registro</th>
+                          <td><%= new Date(student.fechaRegistro).toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' }) %></td>
+                        </tr>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+                
+                <div class="col-md-6">
+                  <div class="card">
+                    <div class="card-header bg-success">
+                      <h5 class="card-title text-white mb-0">
+                        <i class="fas fa-graduation-cap mr-2"></i>
+                        Información Académica
+                      </h5>
+                    </div>
+                    <div class="card-body">
+                      <table class="table table-bordered">
+                        <tr>
+                          <th style="width: 40%">Carrera</th>
+                          <td><%= student.carrera %></td>
+                        </tr>
+                        <tr>
+                          <th>Tipo de Estudiante</th>
+                          <td>
+                            <% if(student.tipoEstudiante === 'Becado') { %>
+                              <span class="badge badge-primary">Becado</span>
+                            <% } else { %>
+                              <span class="badge badge-secondary">Particulado</span>
+                            <% } %>
+                          </td>
+                        </tr>
+                        <% if(student.tipoEstudiante === 'Becado') { %>
+                        <tr>
+                          <th>Tipo de Beca</th>
+                          <td>
+                            <span class="badge badge-info"><%= student.tipoBeca %></span>
+                          </td>
+                        </tr>
+                        <% } %>
+                        <tr>
+                          <th>Estado</th>
+                          <td>
+                            <% let statusClass = 'badge-secondary'; %>
+                            <% if(student.estado === 'Activo') { statusClass = 'badge-success'; } %>
+                            <% if(student.estado === 'Inactivo') { statusClass = 'badge-warning'; } %>
+                            <% if(student.estado === 'Egresado') { statusClass = 'badge-info'; } %>
+                            <% if(student.estado === 'Retirado') { statusClass = 'badge-danger'; } %>
+                            <span class="badge <%= statusClass %>"><%= student.estado %></span>
+                          </td>
+                        </tr>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row mt-4">
+                <div class="col-md-6">
+                  <div class="card">
+                    <div class="card-header bg-dark text-white">
+                      <h5 class="card-title mb-0">
+                        <i class="fas fa-qrcode mr-2"></i>
+                        Código QR del Estudiante
+                      </h5>
+                    </div>
+                    <div class="card-body text-center">
+                      <% if(student.qrCode) { %>
+                        <div class="mb-3">
+                          <img src="<%= student.qrCode %>" alt="Código QR" style="max-width: 200px; border: 1px solid #ddd; padding: 10px;" />
+                        </div>
+                        <div>
+                          <a href="<%= student.qrCode %>" download="qr-<%= student.cedula %>.png" class="btn btn-sm btn-primary">
+                            <i class="fas fa-download mr-1"></i> Descargar QR
+                          </a>
+                          <a href="/control-estudio/estudiantes/resend-qr/<%= student._id %>" class="btn btn-sm btn-info ml-2">
+                            <i class="fas fa-envelope mr-1"></i> Reenviar por correo
+                          </a>
+                        </div>
+                        <div class="mt-2">
+                          <% if(student.qrSent) { %>
+                            <span class="badge badge-success"><i class="fas fa-check"></i> QR enviado por correo</span>
+                          <% } else { %>
+                            <span class="badge badge-warning"><i class="fas fa-exclamation-triangle"></i> QR no enviado</span>
+                          <% } %>
+                        </div>
+                      <% } else { %>
+                        <p class="text-muted">No se ha generado un código QR para este estudiante.</p>
+                        <a href="/control-estudio/estudiantes/resend-qr/<%= student._id %>" class="btn btn-primary">
+                          <i class="fas fa-qrcode mr-1"></i> Generar y enviar QR
+                        </a>
+                      <% } %>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="row mt-4">
+                <div class="col-12">
+                  <a href="/control-estudio/estudiantes" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left mr-1"></i> Volver a la lista
+                  </a>
+                  <a href="/control-estudio/estudiantes/edit/<%= student._id %>" class="btn btn-warning ml-2">
+                    <i class="fas fa-edit mr-1"></i> Editar
+                  </a>
+                  <button type="button" class="btn btn-danger ml-2" data-toggle="modal" data-target="#deleteStudentModal">
+                    <i class="fas fa-trash mr-1"></i> Eliminar
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- Modal de confirmación para eliminar estudiante -->
+<div class="modal fade" id="deleteStudentModal" tabindex="-1" role="dialog" aria-labelledby="deleteStudentModalLabel" aria-hidden="true">
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header bg-danger text-white">
+        <h5 class="modal-title" id="deleteStudentModalLabel"><i class="fas fa-exclamation-triangle"></i> Confirmar eliminación</h5>
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <p>¿Estás seguro de que deseas eliminar al estudiante <strong><%= student.nombres %> <%= student.apellidos %></strong>?</p>
+        <p class="text-danger"><i class="fas fa-exclamation-circle"></i> Esta acción no se puede deshacer.</p>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancelar</button>
+        <a href="/control-estudio/estudiantes/delete/<%= student._id %>" class="btn btn-danger">Eliminar Estudiante</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<%- include('../../partials/footer') %>

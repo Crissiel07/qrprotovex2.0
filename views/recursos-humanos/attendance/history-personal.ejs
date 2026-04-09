@@ -1,0 +1,244 @@
+<h1 class="mt-4">Historial de Asistencia - Personal</h1>
+<p class="lead mb-4">Consulte el registro de asistencia del personal</p>
+
+<div class="card shadow mb-4">
+  <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+    <h6 class="m-0 font-weight-bold text-warning">
+      <i class="fas fa-filter mr-1"></i> Filtros de Búsqueda
+    </h6>
+  </div>
+  <div class="card-body">
+    <form action="/recursos-humanos/attendance/history" method="GET" class="mb-4">
+      <input type="hidden" name="type" value="personal">
+      <div class="row">
+        <div class="col-md-4">
+          <div class="form-group">
+            <label for="employee">Personal</label>
+            <select class="form-control" id="employee" name="employee">
+              <option value="">-- Seleccionar Personal --</option>
+              <% employees.forEach(emp => { %>
+                <option value="<%= emp._id %>" <%= filters.employeeId === emp._id.toString() ? 'selected' : '' %>>
+                  <%= emp.apellidos %>, <%= emp.nombres %> (<%= emp.cedula %>)
+                </option>
+              <% }); %>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="period">Período</label>
+            <select class="form-control" id="period" name="period">
+              <option value="week" <%= filters.period === 'week' ? 'selected' : '' %>>Semana</option>
+              <option value="month" <%= filters.period === 'month' ? 'selected' : '' %>>Mes</option>
+              <option value="year" <%= filters.period === 'year' ? 'selected' : '' %>>Año</option>
+            </select>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="form-group">
+            <label for="value">Valor</label>
+            <input type="number" class="form-control" id="value" name="value" value="<%= filters.value %>">
+          </div>
+        </div>
+        <div class="col-md-2 d-flex align-items-end">
+          <button type="submit" class="btn btn-warning btn-block">
+            <i class="fas fa-search mr-1"></i> Buscar
+          </button>
+        </div>
+      </div>
+    </form>
+    
+    <% if (filters.employeeId) { %>
+      <div class="alert alert-warning">
+        <i class="fas fa-info-circle mr-1"></i> Mostrando registros de <strong><%= selectedEmployee.nombres %> <%= selectedEmployee.apellidos %></strong> para <strong><%= periodName %></strong>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<% if (filters.employeeId) { %>
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+          <h6 class="m-0 font-weight-bold">Información del Personal</h6>
+        </div>
+        <div class="card-body">
+          <div class="text-center mb-3">
+            <i class="fas fa-user-tie fa-4x text-warning mb-3"></i>
+            <h5><%= selectedEmployee.nombres %> <%= selectedEmployee.apellidos %></h5>
+            <p class="mb-1"><strong>Cédula:</strong> <%= selectedEmployee.cedula %></p>
+            <p class="mb-1"><strong>Cargo:</strong> <%= selectedEmployee.cargo %></p>
+            <p class="mb-1"><strong>Departamento:</strong> <%= selectedEmployee.departamento %></p>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-md-8">
+      <div class="card mb-4">
+        <div class="card-header bg-warning text-dark">
+          <h6 class="m-0 font-weight-bold">Estadísticas de Asistencia</h6>
+        </div>
+        <div class="card-body">
+          <div class="row">
+            <div class="col-md-3 mb-3">
+              <div class="card bg-primary text-white">
+                <div class="card-body text-center py-3">
+                  <h3><%= stats.totalDays %></h3>
+                  <p class="mb-0">Días Registrados</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="card bg-success text-white">
+                <div class="card-body text-center py-3">
+                  <h3><%= stats.completedDays %></h3>
+                  <p class="mb-0">Días Completos</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="card bg-danger text-white">
+                <div class="card-body text-center py-3">
+                  <h3><%= stats.incompleteDays %></h3>
+                  <p class="mb-0">Días Incompletos</p>
+                </div>
+              </div>
+            </div>
+            <div class="col-md-3 mb-3">
+              <div class="card bg-info text-white">
+                <div class="card-body text-center py-3">
+                  <h3><%= stats.totalHours %></h3>
+                  <p class="mb-0">Horas Totales</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="card shadow mb-4">
+    <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+      <h6 class="m-0 font-weight-bold text-warning">
+        <i class="fas fa-clipboard-list mr-1"></i> Registros de Asistencia
+      </h6>
+      <div>
+        <button class="btn btn-sm btn-outline-warning" onclick="exportToExcel()">
+          <i class="fas fa-file-excel mr-1"></i> Exportar a Excel
+        </button>
+      </div>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered table-hover" id="attendanceTable">
+          <thead class="thead-light">
+            <tr>
+              <th>Fecha</th>
+              <th>Entrada</th>
+              <th>Salida</th>
+              <th>Horas</th>
+              <th>Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% if (records.length > 0) { %>
+              <% records.forEach(record => { %>
+                <tr>
+                  <td><%= new Date(record.entryTime).toLocaleDateString() %></td>
+                  <td><%= new Date(record.entryTime).toLocaleTimeString() %></td>
+                  <td>
+                    <% if (record.exitTime) { %>
+                      <%= new Date(record.exitTime).toLocaleTimeString() %>
+                    <% } else { %>
+                      <span class="badge badge-warning">Pendiente</span>
+                    <% } %>
+                  </td>
+                  <td>
+                    <% if (record.hoursWorked) { %>
+                      <%= record.hoursWorked.toFixed(2) %> hrs
+                    <% } else { %>
+                      -
+                    <% } %>
+                  </td>
+                  <td>
+                    <% if (record.status === 'entrada') { %>
+                      <span class="badge badge-warning">Incompleto</span>
+                    <% } else { %>
+                      <span class="badge badge-success">Completo</span>
+                    <% } %>
+                  </td>
+                </tr>
+              <% }); %>
+            <% } else { %>
+              <tr>
+                <td colspan="5" class="text-center">No hay registros para el período seleccionado</td>
+              </tr>
+            <% } %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+<% } else { %>
+  <div class="alert alert-info">
+    <i class="fas fa-info-circle mr-1"></i> Seleccione un empleado para ver su historial de asistencia
+  </div>
+<% } %>
+
+<div class="mt-3">
+  <a href="/recursos-humanos" class="btn btn-secondary mr-2">
+    <i class="fas fa-arrow-left"></i> Volver a Recursos Humanos
+  </a>
+  <a href="/recursos-humanos/attendance/scan-personal" class="btn btn-warning">
+    <i class="fas fa-qrcode"></i> Escanear Asistencia
+  </a>
+</div>
+
+<script>
+  function exportToExcel() {
+    // Implementación básica de exportación a Excel
+    let table = document.getElementById("attendanceTable");
+    let html = table.outerHTML;
+    
+    // Crear un blob con el HTML de la tabla
+    let blob = new Blob([html], {type: "application/vnd.ms-excel"});
+    let url = URL.createObjectURL(blob);
+    
+    // Crear un enlace temporal para descargar
+    let a = document.createElement("a");
+    a.href = url;
+    a.download = 'asistencia_personal_<%= selectedEmployee ? selectedEmployee.apellidos : "reporte" %>.xls';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  }
+  
+  // Actualizar el valor según el período seleccionado
+  document.getElementById('period').addEventListener('change', function() {
+    const periodSelect = document.getElementById('period');
+    const valueInput = document.getElementById('value');
+    
+    const now = new Date();
+    
+    switch(periodSelect.value) {
+      case 'week':
+        // Calcular número de semana actual
+        const d = new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate()));
+        const dayNum = d.getUTCDay() || 7;
+        d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+        const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+        const weekNo = Math.ceil((((d - yearStart) / 86400000) + 1) / 7);
+        valueInput.value = weekNo;
+        break;
+      case 'month':
+        valueInput.value = now.getMonth() + 1;
+        break;
+      case 'year':
+        valueInput.value = now.getFullYear();
+        break;
+    }
+  });
+</script>

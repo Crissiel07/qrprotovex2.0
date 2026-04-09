@@ -1,0 +1,215 @@
+<h1 class="mt-4">Dashboard</h1>
+<p class="lead mb-3">Bienvenido <%= user.name %></p>
+<div class="card mb-4">
+  <div class="card-body">
+    <h5 class="card-title">Información de Usuario</h5>
+    <p class="card-text">
+      <strong>Nombre:</strong> <%= user.name %><br>
+      <strong>Email:</strong> <%= user.email %><br>
+      <strong>Rol:</strong> 
+      <% let badgeClass = 'badge-info'; %>
+      <% let roleName = 'Desconocido'; %>
+      
+      <% if(user.role === 'admin') { %>
+        <% badgeClass = 'badge-danger'; %>
+        <% roleName = 'Administrador'; %>
+      <% } else if(user.role === 'recursos_humanos') { %>
+        <% badgeClass = 'badge-warning'; %>
+        <% roleName = 'Recursos Humanos'; %>
+      <% } else if(user.role === 'caja') { %>
+        <% badgeClass = 'badge-info'; %>
+        <% roleName = 'Caja'; %>
+      <% } else if(user.role === 'control_estudio') { %>
+        <% badgeClass = 'badge-success'; %>
+        <% roleName = 'Control de Estudio'; %>
+      <% } %>
+      
+      <span class="badge <%= badgeClass %>">
+        <%= roleName %>
+      </span><br>
+      <strong>ID:</strong> <%= user.id %>
+    </p>
+  </div>
+</div>
+
+<% if(user.role === 'admin') { %>
+  <div class="card mb-4">
+    <div class="card-header bg-danger text-white">
+      <h5 class="mb-0">Panel de Administrador</h5>
+    </div>
+    <div class="card-body">
+      <div class="text-center mb-3">
+        <a href="/admin-panel" class="btn btn-danger"><i class="fas fa-user-shield"></i> Ir al Panel de Administración</a>
+      </div>
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <div class="card">
+            <div class="card-body text-center">
+              <i class="fas fa-users fa-3x mb-3"></i>
+              <h5>Gestión de Usuarios</h5>
+              <p>Administra todos los usuarios del sistema</p>
+              <a href="#" class="btn btn-primary btn-sm">Gestionar</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="card">
+            <div class="card-body text-center">
+              <i class="fas fa-cogs fa-3x mb-3"></i>
+              <h5>Configuración</h5>
+              <p>Configura los parámetros del sistema</p>
+              <a href="#" class="btn btn-primary btn-sm">Configurar</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="card">
+            <div class="card-body text-center">
+              <i class="fas fa-chart-bar fa-3x mb-3"></i>
+              <h5>Reportes</h5>
+              <p>Visualiza reportes y estadísticas</p>
+              <a href="#" class="btn btn-primary btn-sm">Ver Reportes</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+<% if(user.role === 'recursos_humanos') { %>
+  <div class="card mb-4">
+    <div class="card-header bg-warning text-dark">
+      <h5 class="mb-0">Panel de Recursos Humanos</h5>
+    </div>
+    <div class="card-body">
+      <div class="text-center mb-3">
+        <a href="/recursos-humanos" class="btn btn-warning"><i class="fas fa-user-tie"></i> Ir al Panel de Recursos Humanos</a>
+      </div>
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <div class="card">
+            <div class="card-body text-center">
+              <i class="fas fa-user-tie fa-3x mb-3"></i>
+              <h5>Empleados</h5>
+              <p>Gestiona la información de empleados</p>
+              <a href="#" class="btn btn-primary btn-sm">Gestionar</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="card">
+            <div class="card-body text-center">
+              <i class="fas fa-file-contract fa-3x mb-3"></i>
+              <h5>Contratos</h5>
+              <p>Administra contratos y documentación</p>
+              <a href="#" class="btn btn-primary btn-sm">Ver Contratos</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="card">
+            <div class="card-body text-center">
+              <i class="fas fa-calendar-alt fa-3x mb-3"></i>
+              <h5>Asistencia</h5>
+              <p>Control de asistencia y horarios</p>
+              <a href="#" class="btn btn-primary btn-sm">Ver Asistencia</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+<% if(user.role === 'caja') { %>
+  <div class="card mb-4">
+    <div class="card-header bg-info text-white">
+      <h5 class="mb-0">Panel de Caja</h5>
+    </div>
+    <div class="card-body">
+      <div class="text-center mb-3">
+        <a href="/caja" class="btn btn-info"><i class="fas fa-cash-register"></i> Ir al Panel de Caja</a>
+      </div>
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <div class="card">
+            <div class="card-body text-center">
+              <i class="fas fa-cash-register fa-3x mb-3"></i>
+              <h5>Ventas</h5>
+              <p>Registra nuevas ventas y transacciones</p>
+              <a href="#" class="btn btn-primary btn-sm">Nueva Venta</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="card">
+            <div class="card-body text-center">
+              <i class="fas fa-qrcode fa-3x mb-3"></i>
+              <h5>Validaciones QR</h5>
+              <p>Configura validaciones de QR para pagos</p>
+              <a href="/caja/validaciones-qr" class="btn btn-primary btn-sm">Configurar</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="card">
+            <div class="card-body text-center">
+              <i class="fas fa-money-bill-wave fa-3x mb-3"></i>
+              <h5>Cierre de Caja</h5>
+              <p>Realiza el cierre diario de caja</p>
+              <a href="#" class="btn btn-primary btn-sm">Cerrar Caja</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+<% if(user.role === 'control_estudio') { %>
+  <div class="card mb-4">
+    <div class="card-header bg-primary text-white">
+      <h5 class="mb-0">Panel de Control de Estudio</h5>
+    </div>
+    <div class="card-body">
+      <div class="text-center mb-3">
+        <a href="/control-estudio" class="btn btn-primary"><i class="fas fa-user-graduate"></i> Ir al Panel de Control de Estudio</a>
+      </div>
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <div class="card">
+            <div class="card-body text-center">
+              <i class="fas fa-user-graduate fa-3x mb-3"></i>
+              <h5>Estudiantes</h5>
+              <p>Administra los registros de estudiantes</p>
+              <a href="#" class="btn btn-primary btn-sm">Gestionar</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="card">
+            <div class="card-body text-center">
+              <i class="fas fa-book fa-3x mb-3"></i>
+              <h5>Materias</h5>
+              <p>Gestiona las materias y cursos</p>
+              <a href="#" class="btn btn-primary btn-sm">Ver Materias</a>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-4 mb-3">
+          <div class="card">
+            <div class="card-body text-center">
+              <i class="fas fa-clipboard-list fa-3x mb-3"></i>
+              <h5>Calificaciones</h5>
+              <p>Registra y consulta calificaciones</p>
+              <a href="#" class="btn btn-primary btn-sm">Ver Calificaciones</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+<% } %>
+
+<a href="/users/logout" class="btn btn-danger mt-3">Cerrar Sesión</a>
