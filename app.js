@@ -11,8 +11,11 @@ const connectDB = require('./config/db');
 // Inicializar la aplicación
 const app = express();
 
-// Conectar a la base de datos
-connectDB();
+// Asegurar conexión a MongoDB en cada request (patrón serverless)
+app.use(async (req, res, next) => {
+  await connectDB();
+  next();
+});
 
 // Configurar el store para las sesiones
 const store = new MongoDBStore({

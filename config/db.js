@@ -1,17 +1,36 @@
 const mongoose = require('mongoose');
 require('dotenv').config();
 
+// Patrón de conexión cacheada para Vercel serverless
+// Reutiliza la conexión entre invocaciones en lugar de crear una nueva cada vez
+let cached = global.mongoose;
+
+if (!cached) {
+  cached = global.mongoose = { conn: null, promise: null };
+}
+
 const connectDB = async () => {
-  try {
-    const conn = await mongoose.connect(process.env.MONGODB_URI);
-    console.log(`MongoDB Connected: ${conn.connection.host}`);
-  } catch (err) {
-    console.error(`Error al conectar MongoDB: ${err.message}`);
-    // En Vercel no hacemos process.exit para no crashear el serverless
-    if (require.main === module) {
-      process.exit(1);
-    }
+  if (cached.conn) {
+    return cached.conn;
   }
+
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(process.env.MONGODB_URI, {
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 5000,
+      socketTimeoutMS: 10000,
+    });
+  }
+
+  try {
+    cached.conn = await cached.promise;
+    console.log('MongoDB Connected:', mongoose.connection.host);
+  } catch (err) {
+    cached.promise = null;
+    console.error('Error al conectar MongoDB:', err.message);
+  }
+
+  return cached.conn;
 };
 
 module.exports = connectDB;
