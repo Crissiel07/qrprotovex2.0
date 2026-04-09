@@ -20,6 +20,11 @@ const store = new MongoDBStore({
   collection: 'sessions'
 });
 
+// Evitar que errores del store crasheen la función serverless
+store.on('error', function(error) {
+  console.error('Session store error:', error);
+});
+
 // Configurar EJS con rutas absolutas (necesario para Vercel)
 app.use(expressLayouts);
 app.set('view engine', 'ejs');
@@ -75,6 +80,12 @@ app.use('/form-data', formDataRoutes);
 app.use('/caja', cajaRoutes);
 app.use('/recursos-humanos/empleados', employeesRoutes);
 app.use('/recursos-humanos/attendance', attendanceRoutes);
+
+// Middleware global de manejo de errores (evita crashes en Vercel)
+app.use((err, req, res, next) => {
+  console.error('Error no manejado:', err.stack);
+  res.status(500).send('Error interno del servidor: ' + err.message);
+});
 
 // Puerto para el servidor
 const PORT = process.env.PORT || 3000;
