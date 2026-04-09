@@ -20,21 +20,23 @@ const store = new MongoDBStore({
   collection: 'sessions'
 });
 
-// Configurar EJS
+// Configurar EJS con rutas absolutas (necesario para Vercel)
 app.use(expressLayouts);
 app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
 app.set('layout', 'layout');
 
 // Middleware para procesar datos del formulario
 app.use(express.urlencoded({ extended: false }));
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: false, limit: '10mb' }));
 
 // Configurar archivos estáticos
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Configurar sesiones
 app.use(session({
-  secret: process.env.SESSION_SECRET,
+  secret: process.env.SESSION_SECRET || 'fallback_secret_key',
   resave: false,
   saveUninitialized: false,
   store: store,
@@ -68,7 +70,7 @@ const attendanceRoutes = require('./routes/attendance');
 app.use('/', indexRoutes);
 app.use('/users', usersRoutes);
 app.use('/admin-users', adminRoutes);
-app.use('/control-estudio/estudiantes', estudiantesRoutes); 
+app.use('/control-estudio/estudiantes', estudiantesRoutes);
 app.use('/form-data', formDataRoutes);
 app.use('/caja', cajaRoutes);
 app.use('/recursos-humanos/empleados', employeesRoutes);
